@@ -6,40 +6,25 @@ chapter: false
 pre: " <b> 1.4. </b> "
 ---
 
-
-
 ### Week 4 Objectives:
-- Complete Module 6
-- Started on proposal
+- Complete Module 6 (Amazon RDS)
+- Start on proposal
+- Explore a non-AWS technology (Three.js) to avoid burnout
+- Learn about ThreeJS
 
 ### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   |- Module 6: Database Concept review:<br> &emsp; + Database <br> &emsp; + Session <br> &emsp; + Primary/Foreign Key <br> &emsp; + Index <br> &emsp; + Partitions <br> &emsp; + Execution/Query Plan <br> &emsp; + Log & Buffer <br> &emsp; + RDBMS (Relational Database Manangement System) <br> &emsp; + NOSQL <br> ![Database](/images/1-Worklog/Database.png) <br> &emsp; + OLTP(Online Transaction Processing): For payments, transactions <br> &emsp; + OLAP (Online Analytical Processing): Analyze data, predict trends and patterns <br> - AWS RDS (Relational Database Serive): Include Aurora, MySQL, Postgres SQL , MSSQL, Oracle , Maria <br> &emsp; + Automatic backup <br> &emsp; + Generate read replica <br> &emsp; +Read replica can be turned into primary code <br> &emsp; + Auto Fail Over/Multi AZ (Backups on mutiple AZs) <br> &emsp; + Commonly used for OLTP <br> &emsp; + Encrypt data while at rest/in transit <br> &emsp; + Protected my Security Group and NACL <br> &emsp; + Can change instance size <br> &emsp; + Storage Auto SCaling <br> - Amazon Aurora: Optimized underlying storage infrastructure, uses MySQL and PostgreSQL <br> &emsp; + Back track: revert to previous state <br> &emsp; + Clone <br> &emsp; + Global Database (Multi Region) <br> &emsp; + Multi Master: Many Master Databases <br> - Amazon Redshift: Data warehouse service: PostgreSQL core, optimized for OLAP <br> &emsp; + Uses MMP Database: data is partitioned and saved at computer nodes, a Leader node is used to coordinate and compile queries <br> &emsp; + Stores data in a columnar storage format, useful for OLAP applications <br> ![Columnar](/images/1-Worklog/Columnar.png) <br> &emsp; + Uses SQL and drivers like JDBC and ODBC <br> &emsp; + Provide cost effective services (Transient Cluster/ Redshift spectrum) <br> - Amazon ElastiCache: Creates Cluster Caching Engines (Redis/Memcached) <br> &emsp; + Detects and replaces failed nodes <br> &emsp; + Put before CSDL layer in order to cache data <br> &emsp; + Recommended to use Redis for new workloads <br> &emsp; + Using ElastiCache requires caching logic on applications, not recommended to use default system caching <br> - Formulated a proposal for workshop with teammates <br> - School subject: <br> &emsp; + KS57: Completed Quản trị dữ liệu và an toàn thông tin   | 29/09/2025 | 29/09/2025| [Quản trị dữ liệu và an toàn thông tin](https://www.coursera.org/account/accomplishments/verify/JA236L8TZGD7) |
-| 3   |- Lab 43: Guide is broken, the link doesnt go anywhere, going by video <br> &emsp; + Downloaded Schema Conversion Tool <br> &emsp; + Downloaded MSSQL in EC2 Instance <br> &emsp; + No SQL script was given, trying with custom basic MSSQL Database <br> &emsp; + No CloudFormation Stack was given, skipping Oracle Database connection <br> &emsp; + Installed MySQL on EC2 Instance <br> &emsp; + Migrated custom MSSQL Database to MySQL Database using AWS Schema Conversion Tool <br> &emsp; + Created custom RDS to test migration task <br> &emsp; + Attempted to migrate from local machine to RDS <br> &emsp; + Tried to use AWS Replication Agent: Unsuccessful due to it being made for Window/Linux server only, not OS <br> &emsp; + Tried to portforward PC to be used as an endpoint <br> &emsp; + Failed portforwarding, not allowed by ISP   | 30/09/2025 | 30/09/2025      | [Lab 43](https://000043.awsstudygroup.com/) <br><br> [Application Mirgation Service Guide](https://docs.aws.amazon.com/mgn/latest/ug/what-is-application-migration-service.html) |
-| 4   |- Found out AWS account's credits are all expired from doing lab 12 <br> - Wrote a support case <br> - Stopping labs for now <br> - Focus on researching about team's proposal| 01/10/2025 | 01/10/2025 <br> - School subject: <br> &emsp; + ENW439c: Completed Research Methodologies | [Research Methodologies](https://www.coursera.org/account/accomplishments/verify/M3368Q4AAMNB) |
-| 5   |- Continued doing labs by aquiring help from team member: Created an IAM User with admin privilege for me to log in and use their account <br> - Translate first blog| 02/10/2025 | 02/10/2025      | [Blog 1](content/3-BlogsTranslated/3.1-Blog1/_index.md) |
-| 6   |- Joined the AI-Driven Development Life Cycle: Reimagining Software Engineering event <br> - Translated second and third blog| 03/10/2025 | 04/10/2025 | [Blog 2](content/3-BlogsTranslated/3.2-Blog2/_index.md) <br><br> [Blog 3](content/3-BlogsTranslated/3.3-Blog3/_index.md) | 
 
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | ---- | ---------- | --------------- | ------------------ |
+| Mon | Module 6 – Amazon RDS (Part 1): <br> &emsp; + Reviewed relational database fundamentals in the context of managed services on AWS. <br> &emsp; + Learned the high-level overview and main benefits of Amazon RDS compared to self-managed databases on EC2 (managed backups, patching, scaling, Multi-AZ, read replicas). <br> &emsp; + Studied which database engines are supported on RDS (Aurora, MySQL, MariaDB, PostgreSQL, Oracle, SQL Server). <br> &emsp; + Compared when to use RDS versus DynamoDB, Redshift, Neptune, ElastiCache, and S3 for different workloads. | 29/09/2025 | 29/09/2025 | [Amazon RDS – Introduction](https://000005.awsstudygroup.com/vi/1-introduce/) |
+| Tue | Module 6 – Amazon RDS (Part 2): <br> &emsp; + Learned about RDS management features: automated backups, snapshots, maintenance windows, software patching, and event notifications via SNS. <br> &emsp; + Studied encryption at rest and in transit for RDS using AWS KMS and SSL, and how to create encrypted DB instances from encrypted snapshots. <br> &emsp; + Reviewed DB subnet groups and VPC design for RDS by placing DB instances in private subnets across multiple AZs. <br> &emsp; + Learned about main pricing components for RDS: instance hours, storage, IOPS, backup storage, and Multi-AZ. | 30/09/2025 | 30/09/2025 | [Amazon RDS – Management & Security](https://000005.awsstudygroup.com/vi/1-introduce/) |
+| Wed | Module 6 – Amazon RDS (Part 3): <br> &emsp; + Studied performance aspects such as storage types (gp2, Provisioned IOPS, magnetic) and their use cases. <br> &emsp; + Learned how Multi-AZ deployments work, typical failover scenarios, and how DNS endpoints are updated during failover. <br> &emsp; + Reviewed Read Replicas for scaling read workloads and basic high-availability and disaster recovery patterns across AZs and Regions. <br> &emsp; + Read about snapshots, restores, and migration options using Database Migration Service (DMS) and Schema Conversion Tool (SCT). | 01/10/2025 | 01/10/2025 | [Amazon RDS – Performance, Multi-AZ & Read Replicas](https://000005.awsstudygroup.com/vi/1-introduce/) |
+| Thu | Three.js study: <br> &emsp; + Researched what Three.js is and how it builds on top of WebGL to render 3D graphics in the browser. <br> &emsp; + Learned core concepts: Scene, Camera, Renderer, Mesh, Geometry, Material, and basic lighting. <br> &emsp; + Followed introductory examples to render a simple rotating 3D object and experimented with camera controls. <br> &emsp; + Collected ideas on how Three.js could be used for interactive visualizations in the project. | 02/10/2025 | 02/10/2025 | [Three.js Documentation](https://threejs.org/) |
+| Fri | Joined the “AI-Driven Development Life Cycle: Reimagining Software Engineering” event. | 03/10/2025 | 04/10/2025 | |
 
 ### Week 4 Achievements:
 
-* Completed a comprehensive review of core database concepts including RDBMS, keys, indexes, partitioning, OLTP/OLAP, and AWS-specific database services.
-
-* Gained theoretical knowledge of the features and use cases for AWS RDS, Amazon Aurora (e.g., Backtrack, Global Database), Amazon Redshift (Data Warehouse for OLAP), and Amazon ElastiCache (caching with Redis/Memcached).
-
-* Database Migration: Attempted a complex database migration lab, demonstrating resourcefulness by:
-
-  *  Sourcing a custom MSSQL Database and installing necessary services on an EC2 instance due to broken lab guides.
-
-  *  Successfully migrating the custom MSSQL database to MySQL using the AWS Schema Conversion Tool (SCT).
-
-* Identified and addressed the issue of expired AWS credits by raising a support case.
-
-* Secured continuation of lab work by setting up an IAM User with admin privileges on a team member's account.
-
-* Formulated a proposal for the team's upcoming workshop with teammates.
-
-* Completed the translation of three blogs.
-
-* Attended the AI-Driven Development Life Cycle: Reimagining Software Engineering event.
+* Built a solid theoretical understanding of Amazon RDS, including engines, security, networking, Multi-AZ, and Read Replica patterns.
+* Clarified RDS positioning compared to other AWS data services such as DynamoDB, Redshift, Neptune, ElastiCache, and S3.
+* Took a healthy break from AWS-focused content by learning Three.js fundamentals and experimenting with basic 3D scenes for future project ideas.
+* Continued project and learning activities by attending an AI-focused event and translating two technical blog posts.

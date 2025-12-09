@@ -8,31 +8,23 @@ pre: " <b> 1.5. </b> "
 
 ### Week 5 Objectives:
 
-* Continue building and planning proposal
-### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   |- Family matters | 06/10/2025 | 06/10/2025      | |
-| 3   |- Family matters | 07/10/2025 | 07/10/2025      | |
-| 4   |- Learnt how to create basic AWS Architecture Diagrams <br> - Created team's workshop architecture diagram | 08/10/2025 | 08/10/2025      | |
-| 5   | - Lab 35: <br>&emsp; + Succesfully setted up data stream using Kinesis <br>&emsp; + Successfully sent sample data to the S3 using Kinesis Data Generator with Amazon Cognito <br>&emsp; + Learnt how to use AWS Glue Crawler to map data to S3 Bucket <br>&emsp; + Used Athena to query data  <br>&emsp; + USed AWS Glue Notebook to build dataset based on sample data <br>&emsp; + Used Athena to analyze data and visualized with QuickSight <br> - Updated the architecure diagram based on changes in the workshop proposal <br> - Started researching Guard Duty to use as a component of the workshop  | 09/10/2025 | 09/10/2025      |<br> [Lab 35](https://000035.awsstudygroup.com/) |
-| 6   |- Lab 40: <br>&emsp; + Praticed more with AWS Glue and Athena, used it to analyze AWS Monthy Cost data <br> - School subject: <br> &emsp; + KS57:  Completed Giáo dục và Phát triển nguồn nhân lực số  | 10/10/2025 | 10/10/2025      | [Lab 40](https://000040.awsstudygroup.com/) <br><br> [Giáo dục và Phát triển nguồn nhân lực số](https://www.coursera.org/account/accomplishments/verify/QN69JGYDY7PU)|
+* Continue building and planning the workshop proposal.
+* Explore workflow automation with n8n and basic Messenger bot development.
+* Learn Auto Scaling and monitoring (CloudWatch) for AWS workloads.
 
+### Tasks to be carried out this week:
+
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | ---- | ---------- | --------------- | ------------------ |
+| Mon | Researched n8n as a workflow automation tool (self-hosted alternative to tools like Zapier). <br> Learned about core concepts: workflows, triggers, nodes, credentials, and executions. <br> Deployed n8n locally using Docker (basic docker-compose setup) and created simple test workflows (HTTP trigger, timers, basic data transformation). | 06/10/2025 | 06/10/2025 | [n8n Documentation](https://docs.n8n.io/) |
+| Tue | Followed the tutorial video to build a Messenger bot using n8n and Facebook: <br> &emsp; + Set up a Facebook app and page for the bot. <br> &emsp; + Configured webhook and tokens so that messages from Messenger are sent to n8n. <br> &emsp; + Built a simple reply flow in n8n to handle incoming messages and send responses back to Messenger. <br> &emsp; + Tested the bot end-to-end from Messenger on phone/desktop. | 07/10/2025 | 07/10/2025 | [Messenger bot tutorial](https://youtu.be/ieFnSN2Gvs4) |
+| Wed | Translated three assigned blog posts for the workshop materials and documentation, focusing on accuracy of technical terminology and style. | 08/10/2025 | 08/10/2025 | [Blog1](https://docs.google.com/document/d/1ge1HDyGWudRqSg6LUp2y-jgBTH0y7eFBcZLS2q93OK8/edit?usp=sharing) <br> [Blog2](https://docs.google.com/document/d/11Nvdi9t93mp6l4Trngs8DZFN1Cj6UJLeBS4FChl-Hic/edit?usp=sharing) <br> [Blog3](https://docs.google.com/document/d/1CmH2ggwue55AxPlKajLlMa3d5sBV_1vgqRxyIRLuD_E/edit?usp=sharing) |
+| Thu | Auto Scaling workshop – “FCJ Management with Auto Scaling Group”: <br> &emsp; + Reviewed the overall architecture and prerequisites for deploying the FCJ Management application. <br> &emsp; + Studied how to create a Launch Template based on an existing FCJ Management AMI. <br> &emsp; + Learned how to configure an Elastic Load Balancer to distribute traffic across application instances. <br> &emsp; + Learned the steps to create and configure an Auto Scaling Group, scaling policies, and how to test scaling and failover. | 09/10/2025 | 09/10/2025 | [FCJ Management with Auto Scaling Group](https://000006.awsstudygroup.com/vi/) |
+| Fri | AWS CloudWatch Workshop: <br> &emsp; + Studied the overall purpose of Amazon CloudWatch for monitoring metrics, logs, and events across AWS resources and applications. <br> &emsp; + Reviewed preparatory steps for enabling CloudWatch in an account. <br> &emsp; + Learned how CloudWatch Metrics work and what kinds of default and custom metrics can be collected. <br> &emsp; + Studied CloudWatch Logs and how applications can send logs for centralized analysis. <br> &emsp; + Learned how to configure CloudWatch Alarms and Dashboards, and noted cleanup steps for lab resources. | 10/10/2025 | 10/10/2025 | [AWS CloudWatch Workshop](https://000008.awsstudygroup.com/vi/) |
 
 ### Week 5 Achievements:
 
-* Proposal Development: Successfully created and updated the team's workshop architecture diagram, learning the best practices for diagramming AWS architecture.
-
-* Data Streaming and Analytics: Completed a complex lab focused on data pipelines:
-
-  *  Successfully set up a real-time data stream using Amazon Kinesis.
-
-  *  Used Kinesis Data Generator with Amazon Cognito to send sample data to S3.
-
-  * Learned to use AWS Glue Crawler to map data and AWS Glue Notebook to build datasets.
-
-  * Used Amazon Athena for querying data and Amazon QuickSight for data visualization.
-
-* Practiced advanced analytics skills by using AWS Glue and Athena to analyze AWS Monthly Cost data.
-
-* Workshop Research: Initiated research on Amazon GuardDuty as a component for the team's workshop proposal.
+* Learned the basics of n8n, deployed it with Docker, and successfully connected it to Facebook Messenger to build a simple bot. [web:0]
+* Translated three technical blogs, improving both technical understanding and written communication for the workshop. [web:0]
+* Gained theoretical understanding of deploying the FCJ Management application using Launch Templates, Load Balancer, and Auto Scaling Group on AWS. [web:1]
+* Built foundational knowledge of Amazon CloudWatch, including metrics, logs, alarms, and dashboards for monitoring AWS workloads. [web:1]
