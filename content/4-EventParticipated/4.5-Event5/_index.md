@@ -1,270 +1,264 @@
 ---
 title: "Event 5"
-date: "2025-11-19"
-weight: 05
+date: "2025-11-29"
+weight: 5
 chapter: false
 pre: " <b> 4.5. </b> "
 ---
 
-# Summary Report: “Secure Your Applications: AWS Perimeter Protection Workshop”
+# Summary Report: “AWS Cloud Mastery Series #3 – AWS Well-Architected: Security Pillar Workshop”
 
 ### Event Objectives
 
-- Introduce CloudFront as foundation for perimeter protection
-- Introduce WAF and Application Protection
-- Hands On Workshop: Optimize web application with CloudFront
-- Hands On Workshop: Secure Internet Web Application
+- AWS Cloud Club Introduction
+- Pillar 1: Identity a& Access Management (IAM)
+- Pillar 2: Detection & Continuous Monitoring
+- Pillar 3: Infrastructure Protection
+- Pillar 4: Data Protection
+- Pillar 5: Incident Response
 
 ### Speakers
 
-- **Nguyen Gia Hung** - Head of Solution Architect
-- **Julian Ju** - Senior Edge Services Specialist Solution Architect
-- **Kevin Lim** - Senior Edge Services Specialist GTM
+- **Le Vu Xuan An** – AWS Cloud Club Captain, HCMUTE  
+- **Tran Duc Anh** – AWS Cloud Club Captain, SGU  
+- **Tran Doan Cong Ly** – AWS Cloud Club Captain, PTIT  
+- **Danh Hoang Hieu Nghi** – AWS Cloud Club Captain, HUFLIT  
+
+- **Huynh Hoang Long** – AWS Community Builder  
+- **Dinh Le Hoang Anh** – AWS Community Builder  
+
+- **Nguyen Tuan Thinh** – Cloud Engineer Trainee  
+- **Nguyen Do Thanh Dat** – Cloud Engineer Trainee  
+
+- **Van Hoang Kha** – Cloud Security Engineer, AWS Community Builder  
+
+- **Thinh Lam** – FCJ Member  
+- **Viet Nguyen** – FCJ Member  
+
+- **Mendel Grabski (Long)** – Ex-Head of Security & DevOps, Cloud Security Solution Architect  
+- **Tinh Truong** – Platform Engineer at TymeX, AWS Community Builder  
+
+---
 
 ### Key Highlights
 
-## CloudFront
+## AWS Cloud Club
 
-# What Form Of Security Do Customers Need And The Solution
+The session opened with an overview of AWS Cloud Clubs as student-led communities focused on cloud learning and peer support:
 
-Customer Personas:
-- Small website owner: Basic security protection
-- Business users: Comprehensive security against DDoS and bots
-- Scaling businesses: Advanced configurability like origin failover and origin load reduction
+- Help students explore and build real cloud skills through events, labs, and workshops.  
+- Provide opportunities to develop technical leadership (e.g., Cloud Club Captains).  
+- Enable networking with peers, AWS professionals, and broader tech communities.  
 
-Solution: CloudFront
-- Security with predictable monthly cost: Pay flat prices for CDN, WAF, DDoS Protection, DNS and Storage
-- Single plan selection
+Cloud Clubs taking part in FCJA include:
 
-# New CloudFront Pricing: CloudFront Flat-Rate
+- AWS Cloud Club HCMUTE  
+- AWS Cloud Club SGU  
+- AWS Cloud Club PTIT  
+- AWS Cloud Club HUFLIT  
 
-- Flat pricing for CDN, WAF, DDoS Protection, DNS and Storage, pay the same price for unlimited usage
+Overall benefits emphasized: skill-building, a strong community, and career opportunities through visibility, mentorship, and practical experience.
 
-- AWS provides 4 flat pricing plans for CloudFront:
-  + Free: $0/Month
-  + Pro: $15/Month
-  + Business: $200/Month
-  + Premium: $1000/Month
+---
 
-- Each plan have its own usage limit per month:
-  + Free: 1 million requests + 100 GB Data
-  + Pro: 10 millions requests + 50 TB Data
-  + Business: 125 millions requests + 50 TB Data
-  + Premium: 500 millions requests + 50 TB Data
+## Identity & Access Management (IAM)
 
-- Exceeding the usage limit => No extra cost but CloudFront will reduce performance and send alerts  
+IAM was presented as the foundation of the Security Pillar, controlling who can do what in the AWS environment.
 
-# How CloudFront helps in perimeter protection
-- Fight distributed attacks with distributed defense: Rather than defending attacks from all over the world at once, CloudFront helps by defending at edge locations nearest to the source of attacks
-- Shield Advanced: Gains visibility into infrastructure-layer attacks, access to Shield Response Team 24/7
--  Volumetric attack: CloudFront offer inline mitigation, STN Proxy protect from SYN flood attack and automatic network routing
+**Core responsibilities:**
 
-# Cost optimization with Amazon CloudFront
+- Manage identities (Users, Groups, Roles) and their permissions.  
+- Enforce both authentication and authorization across accounts and workloads.  
 
-- AWS Data transfer out to CloudFront: Free
-- 
-- HTTP compression: ~80% compression of object file
-- 
-- HTTPS Encryption in transit:
-    + AWS proprietary TLS
-    + Automatic TLS certificate issuance and validation for no additional cost
-    + Automatic redirection from HTTP to HTTPS
-    + TLS version and cipher suite managed by security policy
-    + TLS 1.3, ECDSA cert, post quantum
-  
-- Upcoming mutual TLS support
-  
-- Origin cloaking with Origin Access Control: signs request with short term credential, applies to S3 Bucket, Lambda Function URL, Elemental Media Package
+**Best practices:**
 
-- Origin cloaking for custom origins: Only allow CloudFront IP with managed prefixes list and add custom header with a predefined secret
+- Apply the **least privilege** principle everywhere.  
+- Avoid using long-lived **root access keys**; remove them after setting up initial configuration.  
+- Minimize wildcards (`"*"`) in Actions/Resources; prefer scoped policies.  
+- Use **Single Sign-On (SSO)** and AWS Organizations for centralized, multi-account access control.
 
-- Content protection with Signed URL: Prevent URL Copy Paste theft
+**Advanced IAM controls:**
 
-- Caching benefits for improved availability: Cache content based on TTL, respond without request to origin and respond stale content in case of origin timeout
+- **Service Control Policies (SCPs):**  
+  - Set the maximum permission boundary at the organization or OU level.  
+  - Filter what accounts *can* do but never grant permissions by themselves.
 
-- Built-in failover and origin failover: Automatically route traffic to optimal and healthy edge location, same goes with origin when the primary fails=> failover to secondary origin
+- **Permission boundaries:**  
+  - Define the maximum effective permissions a user or role can receive from their identity policies.  
+  - Useful for delegation scenarios where developers can create roles but must stay within guardrails.
 
-- Graceful failure: Support for custom error pages, stale content and cached error result
+**MFA comparison:**
 
-# Enhanced performance with Amazon CloudFront
+| TOTP (Time-based One-Time Password)         | FIDO2 (Fast Identity Online 2)               |
+| :------------------------------------------ | :------------------------------------------- |
+| Uses a shared secret and 6-digit codes      | Uses public-key cryptography                 |
+| Requires manual code entry                  | Typically a tap or biometric factor          |
+| Free to use (authenticator apps)           | May involve hardware token cost              |
+| Easier backups and recovery                 | Very strong security, strict/no recovery     |
 
-- Multi-layer caching architecture: Aggregates traffic from CloudFront PoPs in Regional Edge Caches and Origin Shield, enable request collapsing and improve cache hit ratio
+**Credential rotation with Secrets Manager:**
 
-- Multiplexing: Download in parallel
+- Use a rotation Lambda to implement the 4-step cycle: `createSecret → setSecret → testSecret → finishSecret`.  
+- Schedule rotations (for example, every 7 days) and send events to EventBridge for coordination.  
+- Rotate credentials without downtime and deprecate previous versions safely.
 
-- Persistent connections to origins: Avoid extra TCP handshake and maintain full TCP capacity
+---
 
-- AWS Global backbone: Lower Latency and no public internet event impact
+## Detection & Continuous Monitoring
 
-- Run logic at the edge: 
-    + Redirect at edge (CloudFront Function, Lambda at Edge)
-    + URL Rewrite / AB Testing / Geographic Redirect Device-based Redirect
-    + Device based content delivery
-    + Respond faster without origin: Rate limiting / API Mocking / Health check / Error Handling
+The second focus area centered on building multi-layer visibility and automating responses.
 
-# CloudFront use cases
+**Multi-layer security visibility:**
 
-- Static web resources: High cache hit ratio => Performance gains + Minimal origin load
+- **Management events:** API calls and console actions across all accounts (via CloudTrail).  
+- **Data events:** Fine-grained logging for S3 object access and Lambda invocations.  
+- **Network activity:** VPC Flow Logs for traffic patterns, allowed/denied connections.  
+- **Organization-wide coverage:** Aggregated logging across multiple accounts and regions.
 
-- Whole website delivery: Global performance + Security + High availability + Cost 
-optimization
+**Alerting & automation with EventBridge:**
 
-- API acceleration: Reuse connection + AWS backbone => Reduce latency + Selective caching
+- CloudTrail events feed into EventBridge to support near real-time event-driven responses.  
+- EventBridge rules route suspicious events to Lambda, SNS, SQS, or other targets.  
+- Cross-account routing enables a central security account to orchestrate detection and response workflows.
 
-- Media Streaming: Unlimited scale + Low latency + Cost-effective + Millions of concurrent user
+**Detection-as-Code:**
 
-- Large file download: Range requests + Edge caching + 80-90% cost savings
+- Use **CloudTrail Lake** or queryable logs to define reusable, SQL-like detection rules.  
+- Store rules in version control and deploy them via CI/CD for consistency.  
+- Set up organization-wide logging and detection using Infrastructure as Code so that all accounts adhere to the same baseline.
 
-# CloudFront best practices
+---
 
-- End to end visibility: Real user/Internet/Infrastructure monitoring
+## Amazon GuardDuty
 
-- Maximize caching: Normalize cache key, cache dynamic/private content and error caching
+GuardDuty was highlighted as an always-on, managed threat detection service.
 
-- Block unwanted requests: Malicious pattern, rate limiting, DDoS mitigation and filter API requests
+**Three main data sources:**
 
-- Offload business logic: CORS response, redirection at edge and set cookies
+| Data Source           | What It Monitors                            | Example Finding                                           |
+| :-------------------- | :------------------------------------------- | :-------------------------------------------------------- |
+| CloudTrail events     | IAM actions and API calls                    | Someone disables logging or creates high-privilege roles. |
+| VPC Flow Logs         | Network traffic to and from resources        | EC2 instance exfiltrating data to a command-and-control.  |
+| DNS logs              | DNS queries from inside your environment     | Malware contacting suspicious or cryptomining domains.    |
 
-- Automatic failover: Route 53 failover routing + CloudFront Origin Group for request level failover
+**Extended protection plans:**
 
-## AWS WAF & Application Protection
+- **S3 Protection:** Detects unusual object access patterns and scans uploads for malware.  
+- **EKS Protection:** Uses Kubernetes audit logs to detect abnormal cluster operations and correlates with S3 or other services.  
+- **Malware Protection:** Triggers scans on EBS volumes when compromise is suspected.  
+- **RDS Protection:** Monitors database login patterns to detect brute-force attempts.  
+- **Lambda Protection:** Observes network behavior from Lambda functions to catch data exfiltration and beaconing.  
+- **Runtime Monitoring:** With an agent on EC2/EKS/ECS Fargate, monitors processes, file activity, system calls, and privilege escalation attempts.
 
-# Threats and impact to business
+**Compliance and standards:**
 
-- Denial of Service
+GuardDuty and related services can help enforce:
 
-- App Vulnerabilities
+- AWS Foundational Security Best Practices.  
+- CIS AWS Foundations Benchmark.  
+- PCI DSS, NIST and other frameworks (via Security Hub integration).
 
-- Bot traffic
+**Compliance-as-code setup:**
 
-**=>** Stolen data, compromised credentials, spam, downtime, manual intervention, raise infrastructure cost, losing credibility
+- Use CloudFormation (or other IaC) to deploy GuardDuty, Security Hub, and related configuration.  
+- Security Hub runs checks against standard baselines across S3, EC2, RDS, etc.  
+- Findings flow into a central account to support audits and continuous compliance.
 
-# Surge in bot activities
+---
 
-Diverse AI bots from a wide range of source significantly increased in customer environment: 155% increase YoY
+## Network Security Controls
 
-# Route 53 in perimeter protection
+The network layer section organized threats and controls:
 
-Globally dispersed DNS servers => Automatic scaling and DDoS mitigation + Availability SLA 100%
+- **Attack vectors:**
+  - Ingress attacks: DDoS, SQL injection, direct scanning.  
+  - Egress attacks: Data exfiltration, DNS tunneling.  
+  - Lateral movement: East-west traffic between resources after compromise.
 
-# Infrastructure Protection with AWS Shield
+**Core components:**
 
-- At edge:
-    + SYN Proxy
-    + Inspection
-    + Packet validation
-    + Distributed scrubbing capacity
-    + Automatic Routing policy
+- **Security Groups (SGs):**  
+  - Stateful, instance-level firewalls.  
+  - Only allow rules; anything not explicitly allowed is denied.
 
-- At border:
-    + Traffic filtering
-    + Resource-level detection and mitigation
-    + Health-based detection
+- **Network ACLs (NACLs):**  
+  - Stateless, subnet-level filters.  
+  - Ordered rules that can explicitly ALLOW or DENY.  
+  - Useful as an extra layer or for broad deny rules.
 
-# Inspecting HTTP with AWS WAF
+- **Transit Gateway SG referencing:**  
+  - Allows referencing SGs from TGW-attached VPCs to simplify rule management for shared services.  
 
-- WAF works together with CloudFront
+- **Route 53 Resolver:**  
+  - Directs DNS queries to private hosted zones, VPC DNS, or the public internet, supporting split-horizon and centralized DNS patterns.
 
-- Detect HTTP flood, malicious patterns, bad IP
+- **AWS Network Firewall:**  
+  - Handles deep packet inspection, egress filtering, and segmentation.  
+  - Can enforce domain or protocol-based rules and integrate with threat intel (e.g., GuardDuty findings) for automated blocking.
 
-- Bot control
+---
 
-- Fraud control
+## Data Protection & Governance
 
-# Shield Advanced Incident Response
+**Encryption with KMS:**
 
-- Shield/Shield Advanced has metric to trigger alarm to start incident response
+- Data is encrypted using data keys, which are themselves wrapped by Customer Managed Keys (CMKs).  
+- KMS policies and condition keys control when and by whom encryption/decryption operations can occur.
 
-- Shield Advanced provides Shield Response Team 24/7
+**Certificate management (ACM):**
 
-- Find attack vector and contributor
+- Issues free public certificates for many AWS-integrated endpoints.  
+- Manages renewals automatically, typically 60 days before expiry.  
+- DNS validation is recommended for automation and stability.
 
-# WAF Configuration
+**Secrets management:**
 
-- Add rules and rules group
+- AWS Secrets Manager eliminates hardcoded secrets in apps and pipelines.  
+- Supports automatic rotation via Lambda using the four-step cycle (create, set, test, finish).  
 
-- Use managed rules and custom rules
+**Service-level security:**
 
-- Start with COUNT mode: Monitor to avoid false positives
+- **S3 & DynamoDB APIs:**  
+  - Must be accessed over HTTPS; bucket policies can enforce `aws:SecureTransport = true`.  
+- **RDS:**  
+  - Requires the client to trust AWS root CAs.  
+  - SSL/TLS can be enforced (for example, `rds.force_ssl=1` on PostgreSQL).
 
-- Use labels to customize logic and responses
+---
 
-- Scope-down to optimize cost
+## Incident Response & Prevention
 
-# Web ACL/Protection Pack
+**Prevention best practices:**
 
-- Set of rules, rule groups and default action
+- Prefer temporary credentials (STS, IAM roles) over long-lived keys.  
+- Do not expose S3 buckets or other services directly to the internet if unnecessary.  
+- Place sensitive workloads in private subnets behind controlled entry points.  
+- Use Infrastructure as Code for all environments, so rebuilds and audits are easier.  
+- Introduce “double gates” for risky changes: code review plus pipeline approval.
 
-- Associated to resources like CloudFront Distribution
+**Incident response lifecycle:**
 
-- Logging and sampling configurations
+1. **Preparation:** Document runbooks, practice scenarios, define roles.  
+2. **Detection & Analysis:** Use GuardDuty, Security Hub, and logs to identify and investigate incidents.  
+3. **Containment:** Isolate resources, revoke or rotate credentials, restrict network access.  
+4. **Eradication & Recovery:** Remove the root cause, rebuild or restore from known-good states.  
+5. **Post-incident:** Conduct retrospectives, update runbooks, and strengthen controls.
 
-# WAF Rules
-
-- Inspection criteria (IP Address/Header value/Request Body) => Action (Allow/Block/Count/Custom)
-
-- Rate-based rule: Based on number of HTTP request from one IP
-
-# WAF Anti-DDoS Application Layer Protection
-
-- Automatic application layer DDoS mitigation
-
-- Protection with pre-configured rules
-
-- Configurable DDoS Protection based on application needs
-
-# WAF Labels
-
-Added by managed rules (Always) and custom rules (Optional): Indicate matched rule, session status, Geographic and IP-based data and Bot/Fraud activities
-
-# Common bots
-
-What: Self-identifying or Search Engines, Social media, HTTP library
-Common bot control: Looks for request, IP, TLS fingerprint and verifies the bot with labels
-
-# Evasive bots
-
-What: Scrapers, credential stuffers, vulnerability scanners, use existing browser headers and values, not well known and mimic real common bots
-Solution: Client interrogation, identify unique client session and monitor its behavior
-
-## CloudFront hands-on: Perimeter Protection Workshop
-
-# Comparison between normal static S3 hosting Origin and S3 hosting with CloudFront
-
-- CloudFront delivers an object faster when its served from cache
-
-- CloudFront delivers an object faster by using the AWS global network instead of the public internet
-
-- In CloudFront, compression is applied, the object size is significantly reduced
-
-## AWS WAF hands-on: Strengthen Your Web Application Defenses with AWS WAF 
-
-- Created WAF rules to defend against:
-  + Cross site Scripting (XSS)
-  + SQL Injection
-  + Path traversal attack
-  + Server-side asset
-  + Common/Evasive Bot
-  + API misuse
-  + Mystery Test: Configured rule to block an access with encrypted header value
+---
 
 ### Event Experience
 
-The event was very informative and right on time as our team was setting up CloudFront the night before. The new pricing system is so much better for us, with additional WAF for security
+- The workshop was highly relevant to our team’s project on Automated Incident Response and Forensics, especially the parts on GuardDuty, detection pipelines, and incident handling patterns.  
 
-The workshop was very interactive and fun, with Mr.Julian being as supportive as possible too
-We got our questions answered by Mr.Julian after the event too:
+- **Q:** Our project relies on GuardDuty findings for triggering automation, but we’re seeing up to ~5 minutes delay between an incident and the corresponding finding. Is there any way to significantly reduce this latency?  
+  **A:** The 5-minute delay is generally expected, because GuardDuty needs time to analyze large volumes of signals and correlate them into high-confidence findings. To improve responsiveness, you can complement GuardDuty with third-party tools (for example, more real-time anomaly detection) and build additional detections around CloudTrail or other telemetry for earlier signals, then enrich with GuardDuty when it arrives.
 
-Q: WAF can be used control and block bot activities, but lately but the improvement of AI: Especially Gemini's new Agent, which can directly interact on our browser, not headless, can WAF help protect against those?
-
-A: Well with Gemini, the interractions are still called by an API so WAF can detect that, but there is another that we cant detect, Claude Agent, but its only an accessibilty tool and doesnt do many harmful things normal bots do so in the near future we wont need to concern it yet 
+- After the session, Mr. Mendel Grabski spent additional time discussing our project and offered guidance and support, which was valuable for shaping next steps and potential integrations.
 
 #### Some event photos
-![Attendee](/images/4-Event/Event5AttendeePic.jpg)
-_Event Attendee Group Picture_
 
-![Top24Kahoot](/images/4-Event/Event5KahootTop24.jpg)
-_Placed Top 24 on end of event Kahoot Quiz_
+![All Attendee Picture](/images/4-Event/Event6AttendeePic.jpg)  
+_Picture of all attendees_
 
-![Full Threat Blocked](/images/4-Event/FullThreatBlockedWAFWorkshop.jpg)
-_Blocked all workshop's threats_
+![Group Picture With Speaker Mendel Grabski and Speaker Van Hoang Kha](/images/4-Event/Event6PicturewithSpeakers.jpg)  
+_Group picture with speakers Mendel Grabski and Van Hoang Kha_

@@ -1,96 +1,219 @@
 ---
 title: "Event 3"
-date: "2025-11-15"
-weight: 03
+date: "2025-11-17"
+weight: 3
 chapter: false
 pre: " <b> 4.3. </b> "
 ---
 
-# Summary Report: “AWS Cloud Mastery Series #1 - AI/ML/GenAI on AWS”
+# Summary Report: “AWS Cloud Mastery Series #2 – DevOps on AWS”
 
 ### Event Objectives
 
-- Introduce AI/ML/GenAI on AWS
+- Introduce core AWS DevOps services and CI/CD pipelines.
+- Explain Infrastructure as Code (IaC) concepts and common tooling.
+- Cover containerization options on AWS.
+- Demonstrate how to achieve monitoring and observability with AWS services.
 
 ### Speakers
 
-- **Lam Tuan Kiet** – Sr DevOps Engineer, FPT Software
-- **Danh Hoang Hieu Nghi** - AI Engineer, Renova Cloud
-- **Dinh Le Hoang Anh** - Cloud Engineer Trainee, First Cloud AI Journey
-- **Van Hoang Kha** - Cloud Security Engineer, AWS Community Builder
+- **Truong Quang Tinh** – AWS Community Builder, Platform Engineer – TymeX  
+- **Bao Huynh** – AWS Community Builder  
+- **Nguyen Khanh Phuc Thinh** – AWS Community Builder  
+- **Tran Dai Vi** – AWS Community Builder  
+- **Huynh Hoang Long** – AWS Community Builder  
+- **Pham Hoang Quy** – AWS Community Builder  
+- **Nghiem Le** – AWS Community Builder  
+- **Dinh Le Hoang Anh** – Cloud Engineer Trainee, First Cloud AI Journey  
+
 ### Key Highlights
 
-# Explored Generative AI with Amazon Bedrock:
+## DevOps Mindset
 
-**- Foundation Models:** Different from Traditional Model in a sense that it can be adapted for many tasks, provided many fully managed model from leading AI Companies such as: OpenAI, Claude, Anthropic, etc.  
-**- Prompt Engineering:** Crafting and Refining Instructions
-   + Zero-Shot Prompting: A prompt with no prior context or example
-   + Few-shot Prompting: A prompt with a few prior context and example
-   + Chain of Thought: A prompt with thought processes and steps for the actual answer 
-**- Retrieval Augmented Generation(RAG):** Retrieving relevant information from a data source
-   + R: Retrieval - Retrieves relevant information from a knowledge base or data sources 
-   + A: Augmented - Adding the information retrieved as additional context in the user's prompt before inputting it into the model
-   + G: Generation - Responses from the model for the augmented prompt
-   + Use cases: Improved content quality, contextual chatbots and question answering, personalized search and real time data summarization
+**- Culture:** Emphasis on collaboration across teams, high level of automation, continuous learning, and making decisions based on measurable outcomes.
 
-**- Amazon Titan Embedding:** Lightweight model that excels in translating text into numerical representations(embeddings) for high accuracy retrieval tasks, with support for 100+ languages
+**- DevOps Roles:** Typical roles in a modern DevOps organization include DevOps Engineer, Cloud Engineer, Platform Engineer, and Site Reliability Engineer (SRE), each focusing on reliability, delivery speed, and operational excellence.
 
-**- Pretrained AI Services:** 
-  + Amazon Rekognition: Image and Video analysis
-  + Amazon Translate: Detect and translate text
-  + Amazon Textract: Extract Texts and Layouts from documents
-  + Amazon Transcribe: Speech-to-text
-  + Amazon Polly: Text-to-speech
-  + Amazon Comprehend: Extract Insights and Relationships from text
-  + Amazon Kendra: Intelligent Search Service
-  + Amazon Lookout: Detect Anomalies in business metrics, equipment and images
-  + Amazon Personalize: Tailor recommendations to user 
+**- Success Metrics:**
 
-**- Demo:** AMZPhoto: Face recognition from images using AI
+- Healthy, reliable deployments.
+- Improved delivery agility and reduced lead time for changes.
+- Overall system stability and resilience.
+- Better end-user experience and performance.
+- Clear evidence that technology investments provide business value.
 
-**- Amazon Bedrock AgentCore:** A comprehensive agentic platform designed to address challenges in bringing agents into production:
-  + Securely execute and scale agent code.
-  + Incorporate memory (remembering past interactions and learning).
-  + Implement identity and access controls for agents and tools.
-  + Provide agentic tool use for complex workflows.
-  + Discover and connect with custom tools and resources.
-  + Understand and audit every interaction (observability).
-  **+ Foundational Services:** These services are categorized for running agents securely at scale.
+| DO                            | DON'T                            |
+| :---------------------------- | :-------------------------------- |
+| Start with fundamentals       | Stay in tutorial hell             |
+| Learn by building real projects | Copy-paste blindly              |
+| Document everything           | Compare your progress to others   |
+| Master one thing at a time    | Give up after failures            |
+| Improve soft skills           |                                  |
 
-  **+ Enhance with tools & memory:** Includes Memory, Gateway, Browser tool, and Code Interpreter.
+**- Continuous Integration:**  
+Developers integrate changes frequently into a shared main branch, with automated builds and tests ensuring each commit keeps the codebase in a releasable state and enabling continuous delivery or deployment.
 
-  **+ Deploy securely at scale:** Includes Runtime and Identity.
+---
 
-  **+ Gain operational insights:** Includes Observability.
+## Infrastructure as Code (IaC)
 
-  **+ Enabling Agents at Scale (Architecture):** Connects to the AgentCore Gateway (via MCP), Memory, Identity, Observability, Browser, and Code Interpreter.
+**- Benefits:**  
+IaC brings automation, repeatability, and scalability to infrastructure management. Teams can version-control environments, spin them up or tear them down on demand, and collaborate on infrastructure changes as code instead of relying on manual ClickOps.
 
-  **+ Frameworks for Building Agents:** CrewAI, Google ADK, LangGraph/LangChain, LlamaIndex, OpenAI Agents SDK, and Strands Agents SDK.
+### AWS CloudFormation
 
-### Key Takeaways
-- Bedrock is the GenAI Hub: Amazon Bedrock provides fully managed Foundation Models from top companies for many different tasks.
+AWS’s native IaC service that uses JSON/YAML templates to describe and provision full stacks of AWS resources in a predictable and auditable way.
 
-- Customization via Prompts and Data: Various ways to prompts (Zero-Shot, Few-shot, CoT) and utilize RAG to add info for better model responses.
+**- Stack:**  
+A stack is a collection of AWS resources defined in a single template. Operations like create, update, and delete are executed at the stack level, making complex environments easier to manage.
 
-- Embeddings Power Search: Amazon Titan Embedding is a key lightweight model for translating text to numbers, which helps achieve high accuracy in retrieval tasks (like RAG).
+**- CloudFormation Template:**  
+A declarative YAML/JSON file that defines resources, their configuration, and relationships. It acts as a blueprint that can be reused across environments (dev, test, prod).
 
-- Pretrained Models: AWS offers many ready-to-use AI services for common needs, like Rekognition for images and Textract for documents.
+**- How it works (high level):**  
 
-- AgentCore Solves Production Issues: Amazon Bedrock AgentCore is the new comprehensive platform that handles the difficult parts of running AI Agents at scale (like Memory, Identity, and Observability).
+1. Write a template that describes the target infrastructure.  
+2. Store it locally or in S3 and create a stack from it.  
+3. CloudFormation provisions, updates, or deletes resources to match the template.  
 
-### Applying to Work
+**- Drift Detection:**  
+CloudFormation can detect configuration drift when resources have been changed outside of IaC. This helps teams either reconcile the template with reality or roll back unauthorized changes.
 
-- Very useful in our team's later projects which could include more usage of AI Foundation Models in our architecture.
+### AWS Cloud Development Kit (CDK)
+
+An open-source framework that lets you define CloudFormation stacks using real programming languages (TypeScript/JavaScript, Python, Java, C#/.NET, Go).
+
+**- Construct:**  
+Constructs are the building blocks in CDK and represent one or more resources plus configuration. Three construct levels were explained:
+
+- **L1 constructs:** Low-level, map 1:1 to CloudFormation resources for maximum control.  
+- **L2 constructs:** Higher-level, intent-based APIs that wrap common best practices and sensible defaults.  
+- **L3 constructs:** Opinionated “patterns” that compose multiple resources into complete architectures (for example, an API Gateway + Lambda + DynamoDB stack).
+
+### AWS Amplify
+
+A platform focused on building and deploying web and mobile applications. Amplify uses CloudFormation behind the scenes to provision backend and hosting infrastructure, providing a higher-level developer experience with CLI and console workflows.
+
+### Terraform
+
+A popular multi-cloud IaC tool where infrastructure is described in HashiCorp Configuration Language (HCL) and then planned and applied against one or more providers (AWS, Azure, GCP, etc.).
+
+**- Strengths:**  
+
+- Multi-cloud support with a consistent language and workflow.  
+- State tracking, enabling Terraform to understand changes between current and desired infrastructure definitions.
+
+### How to Choose IaC Tools?
+
+**- Criteria to consider:**
+
+- Are you targeting a single cloud (e.g., AWS-only) or multiple providers?  
+- Is your primary role closer to application development or platform/ops?  
+- How well does your chosen cloud and its ecosystem support the tool (docs, examples, official modules, support)?
+
+---
+
+## Container Services on AWS
+
+### Dockerfile
+
+A Dockerfile describes how to build a container image: base image, dependencies, build steps, environment variables, and entrypoint. This ensures the application behaves consistently across environments that support Docker.
+
+**- Images:**  
+Images are immutable blueprints built from a Dockerfile via layered file systems. They are used to run containers consistently in development, staging, and production.
+
+**- Workflow:**  
+Write Dockerfile → build Docker image → run containers locally or in AWS → push the image to a registry such as Amazon ECR or Docker Hub.
+
+### Amazon ECR
+
+A fully managed, secure, and scalable private container registry on AWS where teams can store, manage, and share container images.
+
+**- Key features:**
+
+- Image scanning to detect vulnerabilities.  
+- Immutable tags to avoid accidental overwrites.  
+- Lifecycle policies to clean up old images.  
+- Encryption and IAM integration for secure access.
+
+### Container Orchestration
+
+Container orchestrators manage container scheduling, scaling, and lifecycle:
+
+- Restart failed containers.  
+- Scale out or in based on traffic or metrics.  
+- Balance traffic and place workloads across compute capacity efficiently.
+
+### Kubernetes (K8s)
+
+Open source container orchestration platform that automates deployment, scaling, and self-healing of containerized applications.
+
+**- Components:**
+
+- **Master (Control Plane):** Manages the cluster state, scheduling, and API.  
+- **Worker Nodes:** Run application workloads inside pods.  
+- **Pods:** Smallest deployable unit, typically one or a small set of tightly coupled containers.  
+- **Services:** Stable endpoints and load balancing over sets of pods.
+
+### ECS vs EKS
+
+| Feature                  | Amazon ECS (Elastic Container Service)                      | Amazon EKS (Elastic Kubernetes Service)                          |
+| :----------------------- | :---------------------------------------------------------- | :---------------------------------------------------------------- |
+| **Core Technology**      | AWS-native container orchestration                          | Managed Kubernetes (open-source standard)                         |
+| **Complexity**           | Simpler and easier to operate                               | More flexible but higher operational complexity                   |
+| **Knowledge Required**   | No Kubernetes knowledge required                            | Requires Kubernetes concepts (pods, deployments, services, etc.)  |
+| **AWS Integration**      | Deep integration with AWS services                          | Standard Kubernetes integration, more ecosystem tooling           |
+| **Use Case / Benefits**  | Fast deployments, low ops overhead                          | Multi-cluster, portability, more customization                    |
+| **Ecosystem / Community**| AWS-native tooling and community                            | Large Kubernetes ecosystem and community                          |
+| **Summary**              | Great when you want managed, AWS-centric container platform | Great when you need Kubernetes features or portability            |
+
+### App Runner
+
+A fully managed service suitable for quickly deploying containerized web applications and APIs from source or container registries, ideal for smaller teams or workloads that want minimal infrastructure management.
+
+---
+
+## Monitoring & Observability
+
+### CloudWatch
+
+- Central service to monitor AWS resources and applications in near real-time.  
+- Provides metrics, logs, alarms, and dashboards to improve reliability and cost visibility.  
+- Integrates with other services (e.g., Auto Scaling, EventBridge) for automated responses.
+
+**- CloudWatch Metrics:**  
+Metrics capture performance and health data from AWS services and on-prem workloads (with the CloudWatch Agent), and they can be wired into alarms, scaling policies, and DevOps workflows.
+
+### AWS X-Ray
+
+**- Distributed Tracing:**  
+X-Ray traces requests across microservices, visualizing call graphs and latency between components. This helps identify slow or failing segments in complex architectures.
+
+**- Performance Insight:**  
+Used for root-cause analysis of performance issues and errors, highlighting where time is spent and where failures occur, and providing support for real user monitoring scenarios.
+
+---
 
 ### Event Experience
-- The speakers are very well spoken and informative
-- Q&A: Team member asked an out of topic question but crucial to our project 
-  + Q: The SNS in our architecture which is used to process Guard Duty Findings have encountered a situation where over 1000+ alerts appear at once, how would we resolve this?
-  + A: Add SQS to queue the events and ensure no alert is to be missed
-- Placed top 10 in the end of event Kahoot Quiz and got a picture with the speakers 
-- Created an unofficial group: "Mèo Cam Đeo Khăn", a joint collaboration between my group "The Ballers" and "Vinhomies" 
+
+This event was especially relevant to our project because it aligned with our plan to move from ClickOps to IaC with AWS CDK, improving maintainability, repeatability, and collaboration around infrastructure. The additional details on CloudWatch and X-Ray also supported our monitoring and data visibility requirements.
+
+The speakers also addressed several of our team’s questions:
+
+- **Q:** Our project is currently ClickOps-based, and we want to migrate to CDK. Is there a tool that can scan existing infrastructure and convert it to CDK/CloudFormation?  
+  **A:** There is currently no tool that can reliably reverse-engineer full IaC from an existing environment, so the recommended path is to rebuild the infrastructure using IaC and gradually align the real environment with code.
+
+- **Q:** X-Ray tracing looks similar to CloudTrail. How do they differ?  
+  **A:** X-Ray focuses on tracing application requests and service-to-service calls for performance and debugging, while CloudTrail focuses on auditing API calls and user/role activity in the AWS account.
+
+- **Q:** Our project is built around GuardDuty findings. Any suggestions for reliably generating findings for demo scenarios?  
+  **A:** Port scanning is one way to trigger findings, and GuardDuty can also be configured with custom threat lists (malicious IPs/domains) to generate alerts when related activity is detected.
+
+This was also the first time some speakers presented these topics:
+
+- The DevOps and IaC sections were delivered clearly and structured well.  
+- The Monitoring & Observability part showed some understandable nervousness but still provided useful, practical insight.
 
 #### Some event photos
-![Top 10 Kahoot](/images/4-Event/Kahoottop10.jpg)
-![A Picture with the speakers and top 10 players](/images/4-Event/WithSpeaker.jpg)
-![Mèo Cam Đeo Khăn group](/images/4-Event/Meocamdeokhan.jpg)
+
+![Group picture during the event taken by speaker Tran Dai Vi](/images/4-Event/CM2GroupPic.jpg)

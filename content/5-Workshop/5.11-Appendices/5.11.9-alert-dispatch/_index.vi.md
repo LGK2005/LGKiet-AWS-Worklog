@@ -1,9 +1,9 @@
 ---
 title : "Mã Alert Dispatch"
 date: "2000-01-01"
-weight : 01
+weight : 09
 chapter : false
-pre : " <b> 5.11.1. </b> "
+pre : " <b> 5.11.9. </b> "
 ---
 
 ```python
