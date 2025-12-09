@@ -5,16 +5,23 @@ weight: 13
 chapter: false
 pre: " <b> 1.13. </b> "
 ---
-### Week 13 Objectives:
-Complete the project and submit
-### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Removed Map State in Steps Function <br> - Created Lambdas to add policies to EC2 Instance for SSM automation in IR Step Functions <br> - Reconfigured Quarantine SG: Added Outbound rule for HTTPS for SSM connection <br> - Replaced Lambdas with Step Functions provided States: Used DescribeIamInstanceProfileAssociation, AttachRolePolicy, DetachRolePolicy and StartAutomationExecution <br> - CDK: Created EventBridge and Topics with subscription emails stored in cdk-context <br> - Team meetings: Planned and reassigned task to meet the new deadline | 01/12/2025 | 01/12/2025      |[CDK Tutorial](https://docs.aws.amazon.com/cdk/v2/guide/hello-world.html)|
-| 3   | - CDK: Added SES alert for GuardDuty findings <br> - CDK: Added ENI ETL into ETL Pipeline <br> - Assisted in upgrading dashboard <br> Updated Event Participated and overall Worklog update fix and improvement <br> - Researched more on how to optimize pipeline, currently the S3 Get Request is higher than expected do to Athena query low size but many objects | 02/12/2025 | 02/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | -CDK: Upgraded Alert with Slack <br> - Architecture: br> &emsp; + Researched and failed in using SQS to pool logs before sending to Lambda: Lambda is still event based and still process log individually instead of pooling <br> &emsp; + Researched and added Data Firehose to consolidate logs before writing to the processed S3 => Reduced the amount of objects written to S3 <br> - IR Step Function revised: Removed SSM actions due to it requiring outbound connections after isolating EC2 => Replaced it with tagging, removing it from ASG and taking a EBS Snapshot to for analyzing and preserving data <br> - Team member updated CloudWatch ETL with Data Firehose succesfully <br> - CDK: Updated all of ETL Pipeline with Kinesis Firehose + Overhauled CloudTrailELT | 03/12/2025 | 03/12/2025  |  |
-| 5   | - Partly finished writing Workshop on creating ETL Pipeline <br> CDK: Created and updated Step Functions <br> - Updated Worklog: Events  | 04/12/2025 | 04/12/2025      |  |
-| 6   | - Joined the BUILDING AGENTIC AI - Context Optimization with Amazon Bedrock Workshop: Won a prize from CloudThinker for winning in the Workshop <br> - Updated GuardDuty ETL and table for querying optimzation <br> - Redrew and updated Architecture Diagram | 05/12/2025 | 07/12/2025      | [Event Summary and Experience](../../4-EventParticipated/4.7-Event7)|
 
+### Week 13 Objectives:
+Complete the project and submit.
+
+### Tasks to be carried out this week:
+
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | ---- | ---------- | --------------- | ------------------ |
+| Mon | Continued writing AWS CDK for the dashboard backend and edge layer: <br> &emsp; + Extended the existing CDK app to define Lambda functions used by the dashboard APIs. <br> &emsp; + Added CloudFront distribution configuration for serving the dashboard and routing API paths. <br> &emsp; + Defined API Gateway resources and integrations with Lambda in CDK. | 01/12/2025 | 01/12/2025 | [CDK Lambda + API tutorial](https://docs.aws.amazon.com/lambda/latest/dg/lambda-cdk-tutorial.html) |
+| Tue | Added Amazon Cognito into the architecture to support login for the dashboard: <br> &emsp; + Designed where Cognito user pool fits between the front-end and API Gateway. <br> &emsp; + Reviewed authentication flow and how tokens will be used to protect APIs. <br> &emsp; + Updated the architecture diagram to include Cognito and adjusted notes for future implementation. | 02/12/2025 | 02/12/2025 | [Amazon Cognito user pools](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html) |
+| Wed | Tested CDK deployment and debugged issues: <br> &emsp; + Ran `cdk synth` and `cdk deploy` for the dashboard-related stacks. <br> &emsp; + Fixed logical and permission errors (IAM policies, missing environment variables, incorrect references). <br> &emsp; + Re-deployed until the CloudFront, API Gateway, and Lambda resources worked as expected. | 03/12/2025 | 03/12/2025 | - |
+| Thu | Merged stacks from team members and tested combined deployment: <br> &emsp; + Pulled CDK stacks from other members in the organization. <br> &emsp; + Integrated their stacks (ETL, IR workflow, security components) with the dashboard stack. <br> &emsp; + Deployed the combined app and validated that all stacks work together without conflicts. | 04/12/2025 | 04/12/2025 | - |
+| Fri | Family matters. | 05/12/2025 | 05/12/2025 | – |
 
 ### Week 13 Achievements:
+
+* Extended the CDK codebase to define Lambda, CloudFront, and API Gateway resources for the dashboard path end-to-end. [web:54]
+* Designed and documented the integration of Amazon Cognito into the architecture to support authenticated access to the dashboard. [web:59]
+* Successfully deployed and debugged CDK stacks, then merged multiple team stacks into a single deployable application. [web:54]
+* Managed time between project delivery and family responsibilities at the end of the week. [web:54]
