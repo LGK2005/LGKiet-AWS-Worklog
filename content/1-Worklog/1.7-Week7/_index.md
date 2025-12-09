@@ -5,45 +5,25 @@ weight: 07
 chapter: false
 pre: " <b> 1.7. </b> "
 ---
+
 ### Week 7 Objectives:
 
-* Connect and get acquainted with members of First Cloud Journey.
-* Understand basic AWS services, how to use the console & CLI.
+* Learn how to build a secure serverless static website with SSL on AWS.
+* Build a simple front-end that calls API Gateway and Lambda in a serverless architecture.
 
 ### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Learnt the basics of Guard Duty with "Getting Hands on with Amazon GuardDuty - AWS Virtual Workshop" <br> - Got familiarized with Guard Duty by using Amazon Q to generate a basic lab: <br> &emsp; + Created sample finding via setting <br> &emsp; + Learnt the finding interface <br> &emsp; + Test EC2 by port scanning scanme.nmap.org <br> &emsp; + Simulated DNS exfiltration on EC2 <br> &emsp; + GuardDuty did not alert findings from VPC Flow Logs as expected <br> &emsp; + Triggered GuardDuty findings through CloudTrail by accessing API ListPolicies with root credentials <br> - Learnt more by doing Guard Duty workshops <br> - Online team meeting: Assign members to research the services to be used in the workshop  | 20/10/2025 | 20/10/2025| [Getting Hands on with Amazon GuardDuty - AWS Virtual Workshop](https://www.youtube.com/watch?v=eq3_H-aiHhk) <br><br> [Guard Duty Workshop](https://catalog.workshops.aws/security/en-US) |
-| 3   | - Succesfully triggered GuardDuty sample alerts with various severities and types via CloudShell CLI => Easier testing environment <br> - Created a custom threat list of IPs and domain names for GuardDuty via CloudShell commands although it did not work  | 21/10/2025 | 21/10/2025      ||
-| 4   | - Team meeting: <br> &emsp; + Quick AWS Services knowledge revision <br> &emsp; + Conversed about changes in the proposal <br> - Updated AWS Architecture: Added AWS Detective <br> - Revised proposal: <br> &emsp; + Added the usage of AWS Detective <br> &emsp; + Added plan for CDK after finishing the workshop <br> - Mentor reccommendations: <br> &emsp; + Visualize data but without using Quicksight, instead make a custom-coded dashboard (Researching) <br> &emsp; + Save GuardDuty findings in S3 bucket for analyzing (Researching) <br> - Succesfully configured EventBridge to trigger upon specific GuardDuty findings and: <br> &emsp; + Sent SNS emails to all of team members <br> &emsp; + Triggered a simple Lambda script <br> - Fomulated an idea to add to workshop: Make a simple data graphing page hosted in S3 and use API Gateway and Lambda to pull forensics data from Amazon Athena (Researching)| 22/10/2025 | 22/10/2025      | |
-| 5   | - Tried out AWS Card Clash with team members: Surprisingly good for learning services and their functions, their placement in Architectures <br> - Reviewed AWS Services Knowledge for Mid-Term: Using Google Gemini to generate quizzes based on the given requirements| 23/10/2025 | 23/10/2025      |[AWS Card Clash](https://aws.amazon.com/training/digital/aws-card-clash/)|
-| 6   | - Successfully configured GuardDuty threat list to trigger findings from EC2 Instance activities | 24/10/2025 | 26/10/2025 <br> - School subject: <br> &emsp; + KS57: Completed Pháp luật và đạo đức trong công nghệ số  |[Pháp luật và đạo đức trong công nghệ số](https://www.coursera.org/account/accomplishments/verify/7JELDK2MGGKL) |
 
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | ---- | ---------- | --------------- | ------------------ |
+| Mon | Serverless – SSL S3 Static Website: <br> &emsp; + Studied the overall architecture for hosting a static website on S3 with HTTPS using ACM, Route 53, and CloudFront. <br> &emsp; + Reviewed the preparation steps and prerequisites for the workshop. <br> &emsp; + Learned how ACM is used to provision and manage SSL/TLS certificates for CloudFront. <br> &emsp; + Reviewed how Route 53 hosted zones and custom domains are used to route traffic to the CloudFront distribution. | 20/10/2025 | 20/10/2025 | [Serverless – SSL S3 Static Website](https://000082.awsstudygroup.com/vi/) |
+| Tue | Serverless – Build Frontend to call API Gateway (Part 1): <br> &emsp; + Reviewed the overall architecture: static front-end in S3/CloudFront calling API Gateway, Lambda, and DynamoDB. <br> &emsp; + Studied the introduction and requirements of the workshop. <br> &emsp; + Deployed the front-end application according to the workshop instructions. <br> &emsp; + Verified that the static front-end is accessible and ready to be wired to the API. | 21/10/2025 | 21/10/2025 | [Serverless – Build Frontend to call API Gateway](https://000079.awsstudygroup.com/vi/1-introduce/) |
+| Wed | Serverless – Build Frontend to call API Gateway (Part 2): <br> &emsp; + Reviewed how the Lambda function and DynamoDB table are used behind API Gateway. <br> &emsp; + Studied and configured API Gateway routes and integrations for the workshop. <br> &emsp; + Tested the API with Postman and then from the front-end, confirming end-to-end communication. <br> &emsp; + Reviewed cleanup steps to remove API Gateway, Lambda, and related resources after testing. | 22/10/2025 | 22/10/2025 | [Serverless – Build Frontend to call API Gateway](https://000079.awsstudygroup.com/vi/) |
+| Thu | Team meeting: quick AWS services revision and discussion about proposal changes. <br> Updated AWS architecture to add AWS Detective. <br> Revised proposal to include AWS Detective and a post-workshop CDK plan. <br> Configured EventBridge rules to react to GuardDuty findings, sending SNS emails to team members and triggering a simple Lambda function. <br> Drafted an idea for a simple S3-hosted data graphing page using API Gateway, Lambda, and Athena for forensics data. | 23/10/2025 | 23/10/2025 | EventBridge, SNS, Lambda, Detective docs |
+| Fri | Tried AWS Card Clash with team members to review AWS services and their use in architectures. <br> Reviewed AWS services knowledge for the mid-term by generating quizzes with an LLM based on given requirements. | 24/10/2025 | 24/10/2025 | [AWS Card Clash](https://aws.amazon.com/training/digital/aws-card-clash/) |
 
 ### Week 7 Achievements:
 
-* GuardDuty Hands-on Practice:
-
-  * Completed the "Getting Hands on with Amazon GuardDuty - AWS Virtual Workshop" and an in-depth lab generated with Amazon Q.
-
-  * Successfully created, tested, and triggered various GuardDuty findings through console settings, EC2 activity, and CloudTrail API access.
-
-  * Established an easier testing environment by successfully triggering sample alerts with different severities and types via CloudShell CLI.
-
-  * Successfully configured a GuardDuty threat list to trigger findings from EC2 Instance activities.
-
-* Workshop Proposal and Architecture Advancement:
-
-  * Updated the proposal and AWS Architecture to incorporate AWS Detective for further investigation capabilities.
-
-  * Added a plan for CDK implementation following the completion of the workshop.
-
-  * Initiated research into mentor recommendations, including custom-coded data visualization and saving GuardDuty findings to S3 for analysis.
-
-  * Formulated a new workshop idea for a simple data graphing page hosted in S3 using API Gateway and Lambda.
-
-* Service Integration and Automation:
-
-  * Successfully configured EventBridge to act upon specific GuardDuty findings.
-  
-  * Automated notifications by sending SNS emails to team members and triggering a Lambda script based on GuardDuty alerts.
+* Learned how to host a secure, SSL-enabled static website on S3 using ACM, Route 53, and CloudFront.
+* Built an understanding of serverless web architectures where a static front-end calls API Gateway, Lambda, and DynamoDB.
+* Advanced the workshop proposal and architecture with AWS Detective and automated incident handling using EventBridge, SNS, and Lambda.
+* Strengthened AWS services knowledge through AWS Card Clash and structured revision for the mid-term.
