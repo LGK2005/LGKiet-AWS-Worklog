@@ -1,19 +1,20 @@
 ---
-title : "Giới thiệu"
+title : "Tổng quan"
 date: "2000-01-01" 
-weight : 1
+weight : 1 
 chapter : false
 pre : " <b> 5.1. </b> "
 ---
 
-#### Giới thiệu về VPC Endpoint
+#### Các thành phần hệ thống
++ **Phản hồi sự cố và Điều tra số tự động (Auto Incident Response and Forensics)** là một kiến trúc sử dụng các dịch vụ tự động hóa để thu thập, xử lý và tự động phản hồi các phát hiện bảo mật, giảm thiểu thời gian cần thiết cho sự can thiệp của con người và hỗ trợ nhân viên bảo mật trong việc trực quan hóa và phân tích log.
++ Hệ thống này được xây dựng dựa trên **AWS Security Services** (CloudTrail, GuardDuty, VPC Flow Logs, CloudWatch) đưa dữ liệu vào một **Data Lake tập trung (S3/Glue/Athena)** để phân tích.
++ Tự động hóa cốt lõi được điều khiển bởi **AWS EventBridge** rules kích hoạt **AWS Step Functions** workflows, sau đó thực thi **AWS Lambda** functions để thực hiện các hành động cách ly và cảnh báo.
 
-+ Điểm cuối VPC (endpoint) là thiết bị ảo. Chúng là các thành phần VPC có thể mở rộng theo chiều ngang, dự phòng và có tính sẵn sàng cao. Chúng cho phép giao tiếp giữa tài nguyên điện toán của bạn và dịch vụ AWS mà không gây ra rủi ro về tính sẵn sàng.
-+ Tài nguyên điện toán đang chạy trong VPC có thể truy cập Amazon S3 bằng cách sử dụng điểm cuối Gateway. Interface Endpoint  PrivateLink có thể được sử dụng bởi tài nguyên chạy trong VPC hoặc tại TTDL.
-
-#### Tổng quan về workshop
-Trong workshop này, bạn sẽ sử dụng hai VPC.
-+ **"VPC Cloud"** dành cho các tài nguyên cloud như Gateway endpoint và EC2 instance để kiểm tra.
-+ **"VPC On-Prem"** mô phỏng môi trường truyền thống như nhà máy hoặc trung tâm dữ liệu của công ty. Một EC2 Instance chạy phần mềm StrongSwan VPN đã được triển khai trong "VPC On-prem" và được cấu hình tự động để thiết lập đường hầm VPN Site-to-Site với AWS Transit Gateway. VPN này mô phỏng kết nối từ một vị trí tại TTDL (on-prem) với AWS cloud. Để giảm thiểu chi phí, chỉ một phiên bản VPN được cung cấp để hỗ trợ workshop này. Khi lập kế hoạch kết nối VPN cho production workloads của bạn, AWS khuyên bạn nên sử dụng nhiều thiết bị VPN để có tính sẵn sàng cao.
-
-![overview](/images/5-Workshop/5.1-Workshop-overview/diagram1.png)
+#### Tổng quan về Workshop
+Trong workshop này, bạn sẽ triển khai một hệ thống đa giai đoạn để đạt được tự động hóa bảo mật từ đầu đến cuối. Bao gồm:
++ **Thiết lập nền tảng (Foundation Setup)**: Tạo các S3 buckets và IAM roles chuyên dụng để hỗ trợ tất cả các dịch vụ.
++ **Thiết lập giám sát (Monitoring Setup)**: Kích hoạt và cấu hình các log bảo mật chính (CloudTrail, GuardDuty, VPC Flow Logs) để chuyển dữ liệu đến điểm thu thập log trung tâm.
++ **Thiết lập xử lý (Processing Setup)**: Triển khai Kinesis Firehose, Lambda ETLs, và Glue/Athena tables để chuyển đổi log thô thành một security data lake dễ dàng truy vấn.
++ **Thiết lập tự động hóa (Automation Setup)**: Tạo **Isolation Security Group**, **SNS Topic**, **Incident Response Lambda Functions**, và **Step Functions State Machine** thực thi các hành động cách ly tự động khi GuardDuty phát hiện các vấn đề.
++ **Thiết lập Dashboard (Dashboard Setup)**: Lưu trữ một **giao diện web tĩnh dựa trên S3** an toàn được tăng tốc bởi **CloudFront** và bảo vệ bởi **Cognito** để cung cấp cho các nhà phân tích khả năng trực quan hóa thời gian thực của **dữ liệu điều tra (forensic data)** và khả năng truy vấn trực tiếp qua **API Gateway**.

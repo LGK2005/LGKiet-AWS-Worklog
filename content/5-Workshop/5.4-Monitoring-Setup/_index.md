@@ -11,76 +11,52 @@ This Monitoring Setup phase activates and configures the three core log sources 
 
 ## Create CloudWatch Log Group
 
-1.  **Open CloudWatch Console** → **Log groups** → **Create log group**
-
+1.  **Open CloudWatch Console** → **Log Management** → **Create log group**
+![alt text](</images/5-Workshop/Workshop pic/21 Open CloudWatch Console → Log groups → Create log group 5.4.png>)
 2.  **Configure**:
 
       - **Log group name**: `/aws/incident-response/centralized-logs`
       - **Retention**: 90 days
       - **KMS key**: None
-
 3.  **Click "Create"**
-
 -----
 
 ## Enable AWS CloudTrail
 
-1.  **Open CloudTrail Console** → **Create trail**
-
+1.  **Open CloudTrail Console** → **Trail** → **Create trail**
+![alt text](</images/5-Workshop/Workshop pic/22 Open CloudTrail Console 5.4.png>)
 2.  **Trail attributes**:
 
       - **Trail name**: `incident-responses-cloudtrail-ACCOUNT_ID-REGION`
       - **Storage location**: Use existing S3 bucket
-      - **S3 bucket**: `incident-response-log-list-bucket-ACCOUNT_ID-REGION`
+      - **S3 bucket**: Choose your `incident-response-log-list-bucket-ACCOUNT_ID-REGION`
+      - **Log file SSE-KMS encryption**: Disable
       - **Log file validation**: Enabled
+      - Click next
 
 3.  **Choose log events**:
-
+      - **Events** Choose **Management events**, **Data events**
       - **Management events**: All (Read + Write)
       - **Data events**: S3 - Log all events
+      - Click next till step 4 and **Create Trail**
 
-4.  **Advanced event selectors** (replace `ACCOUNT_ID` and `REGION`):
+4.  **Advanced event selectors: Exlcude log buckets**:
+      - **Click the Trail then scroll down to Data Event and click Edit**
+![alt text](</images/5-Workshop/Workshop pic/23 Advanced event selectors Exlcude log buckets.png>)
+      - **Setup like picture with the under format**:
+![alt text](</images/5-Workshop/Workshop pic/24 [Screenshot CloudTrail septup huhu] .png>)
 
-<!-- end list -->
+-`arn:aws:s3:::incident-response-log-list-bucket-ACCOUNT_ID-REGION/`
 
-```json
-[
-  {
-    "Name": "Log all management events",
-    "FieldSelectors": [
-      {
-        "Field": "eventCategory",
-        "Equals": ["Management"]
-      }
-    ]
-  },
-  {
-    "Name": "Log S3 data events except IR buckets",
-    "FieldSelectors": [
-      {
-        "Field": "eventCategory",
-        "Equals": ["Data"]
-      },
-      {
-        "Field": "resources.type",
-        "Equals": ["AWS::S3::Object"]
-      },
-      {
-        "Field": "resources.ARN",
-        "NotStartsWith": [
-          "arn:aws:s3:::incident-response-log-list-bucket-ACCOUNT_ID-REGION/",
-          "arn:aws:s3:::processed-guardduty-findings-ACCOUNT_ID-REGION/",
-          "arn:aws:s3:::processed-cloudtrail-logs-ACCOUNT_ID-REGION/",
-          "arn:aws:s3:::athena-query-results-ACCOUNT_ID-REGION/",
-          "arn:aws:s3:::processed-cloudwatch-logs-ACCOUNT_ID-REGION/"
-        ]
-      }
-    ]
-  }
-]
-```
+-`arn:aws:s3:::processed-guardduty-findings-ACCOUNT_ID-REGION/` 
 
-5.  **Create trail**
+-`arn:aws:s3:::processed-cloudtrail-logs-ACCOUNT_ID-REGION` 
+
+-`arn:aws:s3:::athena-query-results-ACCOUNT_ID-REGION/`   
+
+-`arn:aws:s3:::processed-cloudwatch-logs-ACCOUNT_ID-REGION/`
+
+5.  **Save change**
 
 -----
 
@@ -121,25 +97,18 @@ This Monitoring Setup phase activates and configures the three core log sources 
 
 1.  **Open the Amazon Route 53 Console**.
    
-2.  In the left navigation pane, select **Resolver** -> **Query logging**.
+2.  In the left navigation pane, select **VPC Resolver** -> **Query logging**.
 
 3.  Click **"Configure query logging"**.
 
 4.  **Configure**:
 
     * **Name**: Enter a descriptive name, e.g., `IR-DNS-Query-Log-Config`.
+    **Destination for query logs**: CloudWatch Logs log group
     * **Log group**: Select **"Existing log group"** and choose:
         * **`/aws/incident-response/centralized-logs`**
 
-5.  Click **"Next"**.
-
-6.  **VPCs to associate with**:
-    * Select the **AWS Region** where your VPC resides.
-    * In the **VPCs** section, locate and check the box next to your target VPC ID (the one noted as `YOUR_VPC_ID` in the prerequisites).
-
-7.  Click **"Next"** to review the configuration.
-
-8.  Click **"Submit"**.
+5.  Click **"Configure query logging"**.
 
 -----
 

@@ -1,37 +1,70 @@
 ---
-title : "Dọn dẹp tài nguyên"
+title : "Cài đặt API Gateway"
 date: "2000-01-01"
-weight : 6
+weight : 03
 chapter : false
-pre : " <b> 5.6. </b> "
+pre : " <b> 5.7.3. </b> "
 ---
+Trong hướng dẫn này, bạn sẽ cài đặt một API Gateway để định tuyến cuộc gọi api từ dashboard tới Lambda.
 
-#### Dọn dẹp tài nguyên
+## Tạo API Gateway
 
-Xin chúc mừng bạn đã hoàn thành xong lab này!
-Trong lab này, bạn đã học về các mô hình kiến trúc để truy cập Amazon S3 mà không sử dụng Public Internet.
+1. **Mở API Gateway Console**
+   - Điều hướng tới https://console.aws.amazon.com/apigateway/
+   - Hoặc: AWS Management Console → Services → API Gateway
 
-+ Bằng cách tạo Gateway endpoint, bạn đã cho phép giao tiếp trực tiếp giữa các tài nguyên EC2 và Amazon S3, mà không đi qua Internet Gateway.
-Bằng cách tạo Interface endpoint, bạn đã mở rộng kết nối S3 đến các tài nguyên chạy trên trung tâm dữ liệu trên chỗ của bạn thông qua AWS Site-to-Site VPN hoặc Direct Connect.
+   ![Screenshot: API Gateway Console Homepage](/images/5-Workshop/5.7-Dashboard-setup/5.7.3-api-gateway-setup/api_page.png)
 
-#### Dọn dẹp
-1. Điều hướng đến Hosted Zones trên phía trái của bảng điều khiển Route 53. Nhấp vào tên của  s3.us-east-1.amazonaws.com zone. Nhấp vào Delete và xác nhận việc xóa bằng cách nhập từ khóa "delete".
+2. **Tạo API**:
+   - Nhấn **Create API**
+   - Chọn **REST API** và nhấn **Build**
+   - Sử dụng cài đặt này để tạo:
+     - Chọn **New API**
+     - Name: **dashboard-api**
+     - API endpoint type: **Regional**
+     - Security policy: **SecurityPolicy_TLS13_1_3_2025_09**
+     - Endpoint access mode: **Basic**
+     - IP address type: **IPv4**
 
-![hosted zone](/images/5-Workshop/5.6-Cleanup/delete-zone.png)
+    ![Screenshot: API Gateway creation setting](/images/5-Workshop/5.7-Dashboard-setup/5.7.3-api-gateway-setup/api_gateway_create_setting.png)
 
-2. Disassociate Route 53 Resolver Rule - myS3Rule from "VPC Onprem" and Delete it. 
+3. **Tạo Resources**:
+    - Bật CORS cho root resource
+    - Nhấn **Create resource** và đặt tên là **logs**
+    - Sau đó nhấn vào tài nguyên **/logs** vừa tạo và nhấn **Create Resource** để tạo tài nguyên con của **/logs**
+    - Đặt tên là **cloudtrail** và bật CORS
+    - Lặp lại ba lần nữa cho **eni_logs**, **guardduty** và **vpc**
 
-![hosted zone](/images/5-Workshop/5.6-Cleanup/vpc.png)
+    ![Screenshot: API Gateway resource list](/images/5-Workshop/5.7-Dashboard-setup/5.7.3-api-gateway-setup/api_resource_create.png)
 
-4.Mở console của CloudFormation và xóa hai stack CloudFormation mà bạn đã tạo cho bài thực hành này:
-+ PLOnpremSetup
-+ PLCloudSetup
+4. **Tạo methods**:
+    - Nhấn vào **/cloudtrail** vừa tạo và nhấn **Create method**
+    - Trong phần tạo method, sử dụng cài đặt này:
+      - Method type: **GET**
+      - Intergration type: **Lambda function**
+      - Bật **Lambda proxy intergration** chọn **Buffered**
+      - Lambda function: chọn region của bạn, tìm kiếm **dashboard-query** và chọn nó
+      - Timout: **29000**
 
-![delete stack](/images/5-Workshop/5.6-Cleanup/delete-stack.png)
+    - Lặp lại ba lần nữa cho **eni_logs**, **guardduty** và **vpc**
 
-5. Xóa các S3 bucket
+    ![Screenshot: API Gateway method list](/images/5-Workshop/5.7-Dashboard-setup/5.7.3-api-gateway-setup/api_method_create.png)
 
-+ Mở bảng điều khiển S3
-+ Chọn bucket chúng ta đã tạo cho lab, nhấp chuột và xác nhận là empty. Nhấp Delete và xác nhận delete.
-+ 
-![delete s3](/images/5-Workshop/5.6-Cleanup/delete-s3.png)
+    -----
+
+    ![Screenshot: API Gateway method list](/images/5-Workshop/5.7-Dashboard-setup/5.7.3-api-gateway-setup/api_result.png)
+
+5. **Triển khai API (Deploy API)**:
+   - Nhấn **Deploy API** ở góc phải
+
+    ![Screenshot: API Gateway Deploy button](/images/5-Workshop/5.7-Dashboard-setup/5.7.3-api-gateway-setup/api_deploy.png)
+
+    - Trong phần deploy API, sử dụng cài đặt này:
+      - Stage: **New stage**
+      - Name: **prod**
+      - Nhấn **Deploy**
+    ![Screenshot: API Gateway Deploy setting](/images/5-Workshop/5.7-Dashboard-setup/5.7.3-api-gateway-setup/api_deploy_setting.png)
+
+    -----
+
+    ![Screenshot: API Gateway Deploy result](/images/5-Workshop/5.7-Dashboard-setup/5.7.3-api-gateway-setup/api_deploy_result.png)

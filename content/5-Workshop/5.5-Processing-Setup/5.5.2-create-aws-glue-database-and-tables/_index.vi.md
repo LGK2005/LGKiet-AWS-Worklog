@@ -1,95 +1,254 @@
 ---
-title : "VPC Endpoint Policies"
+title : "Tạo AWS Glue Database và Tables"
 date: "2000-01-01"
-weight : 5
+weight : 02
 chapter : false
-pre : " <b> 5.5 </b> "
+pre : " <b> 5.5.2. </b> "
 ---
 
-Khi bạn tạo một Interface Endpoint  hoặc cổng, bạn có thể đính kèm một chính sách điểm cuối để kiểm soát quyền truy cập vào dịch vụ mà bạn đang kết nối. Chính sách VPC Endpoint là chính sách tài nguyên IAM mà bạn đính kèm vào điểm cuối. Nếu bạn không đính kèm chính sách khi tạo điểm cuối, thì AWS sẽ đính kèm chính sách mặc định cho bạn để cho phép toàn quyền truy cập vào dịch vụ thông qua điểm cuối.
+## Tạo AWS Glue Database và Tables
 
-Bạn có thể tạo chính sách chỉ hạn chế quyền truy cập vào các S3 bucket cụ thể. Điều này hữu ích nếu bạn chỉ muốn một số Bộ chứa S3 nhất định có thể truy cập được thông qua điểm cuối.
+### Tạo Database
 
-Trong phần này, bạn sẽ tạo chính sách VPC Endpoint hạn chế quyền truy cập vào S3 bucket được chỉ định trong chính sách VPC Endpoint.
+1.  **Mở Glue Console** → **Databases** → **Add database**
 
-![endpoint diagram](/images/5-Workshop/5.5-Policy/s3-bucket-policy.png)
+2.  **Database name**: `security_logs`
 
-#### Kết nối tới EC2 và xác minh kết nối tới S3. 
+3.  **Create database**
 
-1. Bắt đầu một phiên AWS Session Manager mới trên máy chủ có tên là Test-Gateway-Endpoint. Từ phiên này, xác minh rằng bạn có thể liệt kê nội dung của bucket mà bạn đã tạo trong Phần 1: Truy cập S3 từ VPC.
+### Tạo Tables (Sử dụng Athena DDL)
 
+1.  **Mở Athena Console**
+
+2.  **Đặt vị trí lưu kết quả truy vấn (query result location)**: `s3://athena-query-results-ACCOUNT_ID-REGION/`
+
+3.  **Chọn database**: `security_logs`
+
+#### Tạo bảng processed\_cloudtrail
+
+**Chạy DDL này trong Athena** (thay thế `ACCOUNT_ID` và `REGION`):
+
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS security_logs.processed_cloudtrail (
+  `eventtime` string,
+  `eventname` string,
+  `eventsource` string,
+  `awsregion` string,
+  `sourceipaddress` string,
+  `useragent` string,
+  `useridentity` struct<
+    type:string,
+    invokedby:string,
+    principalid:string,
+    arn:string,
+    accountid:string,
+    accesskeyid:string,
+    username:string,
+    sessioncontext:struct<
+      attributes:map<string,string>,
+      sessionissuer:struct<
+        type:string,
+        principalid:string,
+        arn:string,
+        accountid:string,
+        username:string
+      >
+    >,
+    inscopeof:struct<
+      issuertype:string,
+      credentialsissuedto:string
+    >
+  >,
+  `requestparameters` string,
+  `responseelements` string,
+  `resources` array<struct<arn:string,type:string>>,
+  `recipientaccountid` string,
+  `serviceeventdetails` string,
+  `errorcode` string,
+  `errormessage` string,
+  `hour` string,
+  `usertype` string,
+  `username` string,
+  `isconsolelogin` boolean,
+  `isfailedlogin` boolean,
+  `isrootuser` boolean,
+  `isassumedrole` boolean,
+  `ishighriskevent` boolean,
+  `isprivilegedaction` boolean,
+  `isdataaccess` boolean,
+  `target_bucket` string,
+  `target_key` string,
+  `target_username` string,
+  `target_rolename` string,
+  `target_policyname` string,
+  `new_access_key` string,
+  `new_instance_id` string,
+  `target_group_id` string,
+  `identity_principalid` string
+)
+PARTITIONED BY (
+  `date` string
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'serialization.format' = '1'
+)
+LOCATION 's3://processed-cloudtrail-logs-ACCOUNT_ID-REGION/processed-cloudtrail/'
+TBLPROPERTIES (
+  'projection.enabled' = 'true',
+  'projection.date.type' = 'date',
+  'projection.date.format' = 'yyyy-MM-dd',
+  'projection.date.range' = '2025-01-01,NOW',
+  'projection.date.interval' = '1',
+  'projection.date.interval.unit' = 'DAYS',
+  'storage.location.template' = 's3://processed-cloudtrail-logs-ACCOUNT_ID-REGION/processed-cloudtrail/date=${date}/',
+  'classification' = 'json',
+  'compressionType' = 'gzip'
+);
 ```
-aws s3 ls s3://<your-bucket-name>
+
+#### Tạo bảng processed\_guardduty
+
+Chạy DDL này trong Athena:
+
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS security_logs.processed_guardduty (
+  `finding_id` string,
+  `finding_type` string,
+  `title` string,
+  `severity` double,
+  `account_id` string,
+  `region` string,
+  `created_at` string,
+  `event_last_seen` string,
+  `remote_ip` string,
+  `remote_port` int,
+  `connection_direction` string,
+  `protocol` string,
+  `dns_domain` string,
+  `dns_protocol` string,
+  `scanned_ip` string,
+  `scanned_port` int,
+  `aws_api_service` string,
+  `aws_api_name` string,
+  `aws_api_caller_type` string,
+  `aws_api_error` string,
+  `aws_api_remote_ip` string,
+  `target_resource_arn` string,
+  `instance_id` string,
+  `instance_type` string,
+  `image_id` string,
+  `instance_tags` string,
+  `resource_region` string,
+  `access_key_id` string,
+  `principal_id` string,
+  `user_name` string,
+  `s3_bucket_name` string,
+  `date` string,
+  `service_raw` string,
+  `resource_raw` string,
+  `metadata_raw` string
+)
+PARTITIONED BY (
+  `type` string,
+  `year` string,
+  `month` string,
+  `day` string
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'serialization.format' = '1'
+)
+LOCATION 's3://processed-guardduty-findings-ACCOUNT_ID-REGION/processed-guardduty/'
+TBLPROPERTIES (
+  'classification' = 'json',
+  'compressionType' = 'gzip'
+);
 ```
-![test](/images/5-Workshop/5.5-Policy/test1.png)
 
-Nội dung của bucket bao gồm hai tệp có dung lượng 1GB đã được tải lên trước đó.
+#### Tạo bảng vpc\_logs
 
-2. Tạo một bucket S3 mới; tuân thủ mẫu đặt tên mà bạn đã sử dụng trong Phần 1, nhưng thêm '-2' vào tên. Để các trường khác là mặc định và nhấp vào **Create**.
+Chạy DDL này trong Athena:
 
-![create bucket](/images/5-Workshop/5.5-Policy/create-bucket.png)
-
-3. Tạo bucket thành công.
-
-![Success](/images/5-Workshop/5.5-Policy/create-bucket-success.png)
-
-Policy mặc định cho phép truy cập vào tất cả các S3 Buckets thông qua VPC endpoint.
-
-4. Trong giao diện **Edit Policy**, sao chép và dán theo policy sau, thay thế yourbucketname-2 với tên bucket thứ hai của bạn. Policy này sẽ cho phép truy cập đến bucket mới thông qua VPC endpoint, nhưng không cho phép truy cập đến các bucket còn lại. Chọn **Save** để kích hoạt policy.
-
-
-```
-{
-  "Id": "Policy1631305502445",
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "Stmt1631305501021",
-      "Action": "s3:*",
-      "Effect": "Allow",
-      "Resource": [
-      				"arn:aws:s3:::yourbucketname-2",
-       				"arn:aws:s3:::yourbucketname-2/*"
-       ],
-      "Principal": "*"
-    }
-  ]
-}
-```
-
-![custom policy](/images/5-Workshop/5.5-Policy/policy2.png)
-
-Cấu hình policy thành công.
-
-![success](/images/5-Workshop/5.5-Policy/success.png)
-
-5. Từ session của bạn trên Test-Gateway-Endpoint instance, kiểm tra truy cập đến S3 bucket bạn tạo ở bước đầu
-
-```
-aws s3 ls s3://<yourbucketname>
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS security_logs.vpc_logs (
+  `version` string,
+  `account_id` string,
+  `region` string,
+  `vpc_id` string,
+  `query_timestamp` string,
+  `query_name` string,
+  `query_type` string,
+  `query_class` string,
+  `rcode` string,
+  `answers` string,
+  `srcaddr` string,
+  `srcport` int,
+  `transport` string,
+  `srcids_instance` string,
+  `timestamp` string
+)
+PARTITIONED BY (
+  `date` string
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'serialization.format' = '1',
+  'ignore.malformed.json' = 'true'
+)
+LOCATION 's3://processed-cloudwatch-logs-ACCOUNT_ID-REGION/vpc-logs/'
+TBLPROPERTIES (
+  'projection.enabled' = 'true',
+  'projection.date.type' = 'date',
+  'projection.date.format' = 'yyyy-MM-dd',
+  'projection.date.range' = '2025-01-01,NOW',
+  'projection.date.interval' = '1',
+  'projection.date.interval.unit' = 'DAYS',
+  'storage.location.template' = 's3://processed-cloudwatch-logs-ACCOUNT_ID-REGION/vpc-logs/date=${date}/',
+  'classification' = 'json',
+  'compressionType' = 'gzip'
+);
 ```
 
-Câu lệnh trả về lỗi bởi vì truy cập vào S3 bucket không có quyền trong VPC endpoint policy.
+#### Tạo bảng eni\_flow\_logs
 
-![error](/images/5-Workshop/5.5-Policy/error.png)
+Chạy DDL này trong Athena:
 
-6. Trở lại home directory của bạn trên EC2 instance ```cd~```
-
-+ Tạo file ```fallocate -l 1G test-bucket2.xyz ```
-+ Sao chép file lên bucket thứ  2 ```aws s3 cp test-bucket2.xyz s3://<your-2nd-bucket-name>```
-
-![success](/images/5-Workshop/5.5-Policy/test2.png)
-
-Thao tác này được cho phép bởi VPC endpoint policy.
-
-![success](/images/5-Workshop/5.5-Policy/test2-success.png)
-
-Sau đó chúng ta kiểm tra truy cập vào S3 bucket đầu tiên
-
- ```aws s3 cp test-bucket2.xyz s3://<your-1st-bucket-name>```
-
- ![fail](/images/5-Workshop/5.5-Policy/test2-fail.png)
-
- Câu lệnh xảy ra lỗi bởi vì bucket không có quyền truy cập bởi VPC endpoint policy.
-
-Trong phần này, bạn đã tạo chính sách VPC Endpoint cho Amazon S3 và sử dụng AWS CLI để kiểm tra chính sách. Các hoạt động AWS CLI liên quan đến bucket S3 ban đầu của bạn thất bại vì bạn áp dụng một chính sách chỉ cho phép truy cập đến bucket thứ hai mà bạn đã tạo. Các hoạt động AWS CLI nhắm vào bucket thứ hai của bạn thành công vì chính sách cho phép chúng. Những chính sách này có thể hữu ích trong các tình huống khi bạn cần kiểm soát quyền truy cập vào tài nguyên thông qua VPC Endpoint.
+```sql
+CREATE EXTERNAL TABLE IF NOT EXISTS security_logs.eni_flow_logs (
+  `version` int,
+  `account_id` string,
+  `interface_id` string,
+  `srcaddr` string,
+  `dstaddr` string,
+  `srcport` int,
+  `dstport` int,
+  `protocol` int,
+  `packets` bigint,
+  `bytes` bigint,
+  `start_time` bigint,
+  `end_time` bigint,
+  `action` string,
+  `log_status` string,
+  `timestamp_str` string
+)
+PARTITIONED BY (
+  `date` string
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'serialization.format' = '1'
+)
+LOCATION 's3://processed-cloudwatch-logs-ACCOUNT_ID-REGION/eni-flow-logs/'
+TBLPROPERTIES (
+  'projection.enabled' = 'true',
+  'projection.date.type' = 'date',
+  'projection.date.format' = 'yyyy-MM-dd',
+  'projection.date.range' = '2025-01-01,NOW',
+  'projection.date.interval' = '1',
+  'projection.date.interval.unit' = 'DAYS',
+  'storage.location.template' = 's3://processed-cloudwatch-logs-ACCOUNT_ID-REGION/eni-flow-logs/date=${date}/',
+  'classification' = 'json',
+  'compressionType' = 'gzip'
+);
+```

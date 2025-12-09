@@ -24,23 +24,18 @@ In this section, you will create 5 S3 buckets that serve as the foundation for t
    - Navigate to https://console.aws.amazon.com/s3/
    - Or: AWS Management Console → Services → S3
 
-   > [Screenshot: AWS S3 Console Homepage]
+![alt text](</images/5-Workshop/Workshop pic/1 S3 console 5.3.1.png>)
 
 2. **Click on "Create bucket"**
-
-   > [Screenshot: Create Bucket Button]
-
 3. **General configuration**:
    - **Bucket name**: Enter `incident-response-log-list-bucket-ACCOUNT_ID-REGION`
      - Example: `incident-response-log-list-bucket-123456789012-us-east-1`
    - **AWS Region**: Select your target region (e.g., US East (N. Virginia) us-east-1)
 
-   > [Screenshot: S3 Bucket Configuration - Bucket name and region]
+![alt text](</images/5-Workshop/Workshop pic/2 S3 name 5.3.1.png>)
 
 4. **Object Ownership**:
    - Keep default: **ACLs disabled (recommended)**
-
-   > [Screenshot: S3 Bucket Configuration - Object Ownership]
 
 5. **Block Public Access settings for this bucket**:
    - Check **"Block all public access"**
@@ -50,12 +45,10 @@ In this section, you will create 5 S3 buckets that serve as the foundation for t
      - ✓ Block public access to buckets and objects granted through new public bucket or access point policies
      - ✓ Block public and cross-account access to buckets and objects through any public bucket or access point policies
 
-   > [Screenshot: S3 Bucket Configuration - Block Public Access settings]
-
 6. **Bucket Versioning**:
    - Select **"Enable"**
 
-   > [Screenshot: Bucket Versioning Setting]
+![alt text](</images/5-Workshop/Workshop pic/3 Bucket versioning 5.3.1.png>)
 
 7. **Tags** (optional):
    - Add tags if desired
@@ -65,20 +58,16 @@ In this section, you will create 5 S3 buckets that serve as the foundation for t
    - **Encryption type**: Select **"Server-side encryption with Amazon S3 managed keys (SSE-S3)"**
    - **Bucket Key**: Keep default (**Enabled**)
 
-   > [Screenshot: Default Encryption Settings]
-
 9. **Advanced settings**:
    - Keep all defaults
 
 10. **Click "Create bucket"**
 
-    > [Screenshot: Create bucket button at bottom of page]
-
 11. **Verify bucket creation**:
     - You should see a success message
     - The bucket should appear in your S3 buckets list
 
-    > [Screenshot: S3 Console showing newly created bucket]
+![alt text](</images/5-Workshop/Workshop pic/5 Bucket create succesfull 5.3.1 .png>)
 
 12. **Repeat steps 2-10 for the remaining 4 buckets**:
     - `processed-cloudtrail-logs-ACCOUNT_ID-REGION`
@@ -90,4 +79,4 @@ In this section, you will create 5 S3 buckets that serve as the foundation for t
     - Navigate to S3 Console
     - You should see all 5 buckets listed
 
-    > [Screenshot: S3 Console showing all 5 buckets]
+![alt text](</images/5-Workshop/Workshop pic/6 check for 5 bucket.png>)

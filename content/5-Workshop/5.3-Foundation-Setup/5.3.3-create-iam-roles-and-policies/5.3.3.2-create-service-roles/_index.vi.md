@@ -1,58 +1,234 @@
 ---
-title : "Chuẩn bị tài nguyên"
+title : "Tạo Service Roles"
 date: "2000-01-01"
-weight : 1
+weight : 02
 chapter : false
-pre : " <b> 5.4.1 </b> "
+pre : " <b> 5.3.3.2. </b> "
 ---
 
-Để chuẩn bị cho phần này của workshop, bạn sẽ cần phải:
-+ Triển khai CloudFormation stack
-+ Sửa đổi bảng định tuyến VPC.
+### Tạo Firehose Roles
 
-Các thành phần này hoạt động cùng nhau để mô phỏng DNS forwarding và name resolution.
+#### Tạo CloudTrailFirehoseRole
 
-#### Triển khai CloudFormation stack
+1.  **Mở IAM Console** → **Roles** → **Create role**
 
-Mẫu CloudFormation sẽ tạo các dịch vụ bổ sung để hỗ trợ mô phỏng môi trường truyền thống:
-+ Một Route 53 Private Hosted Zone lưu trữ các bản ghi Bí danh (Alias records) cho điểm cuối PrivateLink S3
-+ Một Route 53 Inbound Resolver endpoint cho phép "VPC Cloud" giải quyết các yêu cầu resolve DNS gửi đến Private Hosted Zone
-+ Một Route 53 Outbound Resolver endpoint cho phép "VPC On-prem" chuyển tiếp các yêu cầu DNS cho S3 sang "VPC Cloud"
+2.  **Chọn trusted entity**:
 
-![route 53 diagram](/images/5-Workshop/5.4-S3-onprem/route53.png)
+      - **Trusted entity type**: **AWS service**
+      - **Use case**: Chọn **"Kinesis"** → **"Kinesis Firehose"**
+      - Nhấn **"Next"**
 
-1. Click link sau để mở [AWS CloudFormation console](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/reinvent-endpoints-builders-session/R53CF.yaml&stackName=PLOnpremSetup). Mẫu yêu cầu sẽ được tải sẵn vào menu. Chấp nhận tất cả mặc định và nhấp vào Tạo stack.
+![alt text](</images/5-Workshop/Workshop pic/20 5.3.3.2 Firehose Select trusted entity_.png>)
 
-![Create stack](/images/5-Workshop/5.4-S3-onprem/create-stack.png)
+3.  **Thêm permissions**:
 
-![Button](/images/5-Workshop/5.4-S3-onprem/create-stack-button.png)
+      - Bỏ qua việc thêm managed policies (chúng ta sẽ thêm inline policy)
+      - Nhấn **"Next"**
 
-Có thể mất vài phút để triển khai stack hoàn tất. Bạn có thể tiếp tục với bước tiếp theo mà không cần đợi quá trình triển khai kết thúc.
+4.  **Đặt tên và tạo**:
 
-####  Cập nhật bảng định tuyến private on-premise 
+      - **Role name**: `CloudTrailFirehoseRole`
+      - **Description**: `Allows Firehose to write CloudTrail logs to S3`
+      - Nhấn **"Create role"**
 
-Workshop này sử dụng StrongSwan VPN chạy trên EC2 instance để mô phỏng khả năng kết nối giữa trung tâm dữ liệu truyền thống và môi trường cloud AWS. Hầu hết các thành phần bắt buộc đều được cung cấp trước khi bạn bắt đầu. Để hoàn tất cấu hình VPN, bạn sẽ sửa đổi bảng định tuyến "VPC on-prem" để hướng lưu lượng đến cloud đi qua StrongSwan VPN instance.
+5.  **Thêm inline policy**:
 
-1. Mở Amazon EC2 console 
+      - Policy name: `FirehosePolicy`
+      - Policy JSON:
 
-2. Chọn instance tên infra-vpngw-test. Từ Details tab, copy Instance ID và paste vào text editor của bạn để sử dụng ở những bước tiếp theo
+<!-- end list -->
 
-![ec2 id](/images/5-Workshop/5.4-S3-onprem/ec2-onprem-id.png)
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::processed-cloudtrail-logs-ACCOUNT_ID-REGION",
+        "arn:aws:s3:::processed-cloudtrail-logs-ACCOUNT_ID-REGION/*"
+      ]
+    }
+  ]
+}
+```
 
-3. Đi đến VPC menu bằng cách gõ "VPC" vào Search box
+#### Tạo CloudWatchFirehoseRole
 
-4. Click vào Route Tables, chọn RT Private On-prem route table, chọn Routes tab, và click Edit Routes.
+  - Role name: `CloudWatchFirehoseRole`
+  - Description: `Allows Firehose to write CloudWatch logs to S3`
+  - Trusted entity: Kinesis Firehose
+  - Inline policy name: `FirehosePolicy`
+  - Inline policy JSON:
 
-![rt](/images/5-Workshop/5.4-S3-onprem/rt.png)
+<!-- end list -->
 
-5. Click Add route.
-+ Destination: CIDR block của Cloud VPC
-+ Target: ID của infra-vpngw-test instance (bạn đã lưu lại ở bước trên)
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::processed-cloudwatch-logs-ACCOUNT_ID-REGION",
+        "arn:aws:s3:::processed-cloudwatch-logs-ACCOUNT_ID-REGION/*"
+      ]
+    }
+  ]
+}
+```
 
-![add route](/images/5-Workshop/5.4-S3-onprem/add-route.png)
+### Tạo Step Functions Role
 
-6. Click Save changes
+#### Tạo StepFunctionsRole
 
+1.  **Tạo role**:
 
+      - **Trusted entity**: Step Functions
+      - **Role name**: `StepFunctionsRole`
+      - **Description**: `Execution role for Incident Response Step Functions`
 
+2.  **Thêm HAI inline policies**:
 
+**Policy 1: LambdaInvokePolicy**
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "lambda:InvokeFunction",
+      "Resource": [
+        "arn:aws:lambda:REGION:ACCOUNT_ID:function:ir-isolate-ec2-lambda",
+        "arn:aws:lambda:REGION:ACCOUNT_ID:function:ir-parse-findings-lambda",
+        "arn:aws:lambda:REGION:ACCOUNT_ID:function:ir-quarantine-iam-lambda"
+      ]
+    }
+  ]
+}
+```
+
+**Policy 2: EC2AutoScalingPolicy**
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "autoscaling:DescribeAutoScalingInstances",
+        "autoscaling:DetachInstances",
+        "autoscaling:UpdateAutoScalingGroup",
+        "ec2:CreateSnapshot",
+        "ec2:CreateTags",
+        "ec2:DescribeVolumes",
+        "ec2:ModifyInstanceAttribute"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### Tạo EventBridge Role
+
+#### Tạo IncidentResponseStepFunctionsEventRole
+
+  - Role name: `IncidentResponseStepFunctionsEventRole`
+  - Description: `Allows EventBridge to trigger Step Functions`
+  - Trusted entity: EventBridge
+  - Inline policy name: `StartStepFunctionsPolicy`
+  - Inline policy JSON:
+
+<!-- end list -->
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "states:StartExecution",
+      "Resource": "arn:aws:states:REGION:ACCOUNT_ID:stateMachine:IncidentResponseStepFunctions"
+    }
+  ]
+}
+```
+
+### Tạo VPC Flow Logs Role
+
+#### Tạo FlowLogsIAMRole
+
+1.  **Tạo role**:
+
+      - **Trusted entity**: EC2 (will edit trust policy - sẽ chỉnh sửa trust policy sau)
+      - **Role name**: `FlowLogsIAMRole`
+
+2.  **Chỉnh sửa trust relationship** thành:
+
+<!-- end list -->
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "vpc-flow-logs.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+```
+
+3.  **Thêm inline policy**:
+      - Policy name: `FlowLogsPolicy`
+      - Policy JSON:
+
+<!-- end list -->
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### Tạo Glue Role
+
+#### Tạo GlueCloudWatchRole
+
+  - Role name: `GlueCloudWatchRole`
+  - Description: `Allows Glue to access S3 and CloudWatch Logs`
+  - Trusted entity: Glue
+  - **Managed policies** (đính kèm 3 policies):
+      - AWSGlueServiceRole
+      - CloudWatchLogsReadOnlyAccess
+      - AmazonS3FullAccess
+  - **Không cần inline policies**

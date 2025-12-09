@@ -18,7 +18,7 @@ pre : " <b> 5.3.3.2. </b> "
       - **Use case**: Select **"Kinesis"** → **"Kinesis Firehose"**
       - Click **"Next"**
 
-    > [Screenshot: IAM Create role - Select Kinesis Firehose trusted entity]
+![alt text](</images/5-Workshop/Workshop pic/20 5.3.3.2 Firehose Select trusted entity_.png>)
 
 3.  **Add permissions**:
 

@@ -14,17 +14,15 @@ pre : " <b> 5.3.3.1. </b> "
       - Navigate to https://console.aws.amazon.com/iam/
       - Or: AWS Management Console → Search for "IAM" → Click "IAM"
 
-    > [Screenshot: IAM Console Dashboard]
+![alt text](</images/5-Workshop/Workshop pic/11 iam console 5.3.3.1.png>)
 
 2.  **Navigate to Roles**:
 
       - In the left sidebar, click **"Roles"**
 
-    > [Screenshot: IAM Console with Roles menu item]
-
 3.  **Click "Create role"**
 
-    > [Screenshot: IAM Roles page with Create role button]
+![alt text](</images/5-Workshop/Workshop pic/12 create role.png>)
 
 4.  **Select trusted entity**:
 
@@ -32,7 +30,7 @@ pre : " <b> 5.3.3.1. </b> "
       - **Use case**: Select **"Lambda"**
       - Click **"Next"**
 
-    > [Screenshot: IAM Create role - Select trusted entity]
+![alt text](</images/5-Workshop/Workshop pic/13 create role setting.png>)
 
 5.  **Add permissions**:
 
@@ -40,7 +38,7 @@ pre : " <b> 5.3.3.1. </b> "
       - Check the box next to **"AWSLambdaBasicExecutionRole"**
       - Click **"Next"**
 
-    > [Screenshot: IAM Create role - Add permissions]
+![alt text](</images/5-Workshop/Workshop pic/14 add permission.png>)
 
 6.  **Name, review, and create**:
 
@@ -48,7 +46,7 @@ pre : " <b> 5.3.3.1. </b> "
       - **Description**: Enter `Execution role for CloudTrail ETL Lambda function`
       - Click **"Create role"**
 
-    > [Screenshot: IAM Create role - Name and review]
+![alt text](</images/5-Workshop/Workshop pic/15 Name, review, and create.png>)
 
 7.  **Add inline policy**:
 
@@ -56,7 +54,7 @@ pre : " <b> 5.3.3.1. </b> "
       - Click on the **"Permissions"** tab
       - Click **"Add permissions"** → **"Create inline policy"**
 
-    > [Screenshot: IAM Role permissions tab with Add permissions button]
+![alt text](</images/5-Workshop/Workshop pic/16 Add inline policy.png>)
 
 8.  **Create inline policy**:
 
@@ -86,7 +84,7 @@ pre : " <b> 5.3.3.1. </b> "
 }
 ```
 
-> [Screenshot: IAM Create policy - JSON editor]
+![alt text](</images/5-Workshop/Workshop pic/17 Create inline policy .png>)
 
 9.  **Click "Next"**
 
@@ -95,14 +93,11 @@ pre : " <b> 5.3.3.1. </b> "
       - **Policy name**: Enter `CloudTrailETLPolicy`
       - Click **"Create policy"**
 
-    > [Screenshot: IAM Create policy - Review and create]
-
 11. **Verify role creation**:
 
       - You should see the role with both managed and inline policies attached
 
-    > [Screenshot: IAM Role showing AWSLambdaBasicExecutionRole and CloudTrailETLPolicy]
-
+![alt text](</images/5-Workshop/Workshop pic/19 Verify role creation_.png>)
 #### Create Remaining Lambda Roles
 
 **Follow the same process for each role below** (steps 3-11):
@@ -337,257 +332,3 @@ pre : " <b> 5.3.3.1. </b> "
   ]
 }
 ```
-### 3.2 Create Firehose Roles
-
-#### 3.2.1 Create CloudTrailFirehoseRole
-
-1.  **Open IAM Console** → **Roles** → **Create role**
-
-2.  **Select trusted entity**:
-
-      - **Trusted entity type**: **AWS service**
-      - **Use case**: Select **"Kinesis"** → **"Kinesis Firehose"**
-      - Click **"Next"**
-
-    > [Screenshot: IAM Create role - Select Kinesis Firehose trusted entity]
-
-3.  **Add permissions**:
-
-      - Skip adding managed policies (we'll add inline policy)
-      - Click **"Next"**
-
-4.  **Name and create**:
-
-      - **Role name**: `CloudTrailFirehoseRole`
-      - **Description**: `Allows Firehose to write CloudTrail logs to S3`
-      - Click **"Create role"**
-
-5.  **Add inline policy**:
-
-      - Policy name: `FirehosePolicy`
-      - Policy JSON:
-
-<!-- end list -->
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetBucketLocation",
-        "s3:ListBucket",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::processed-cloudtrail-logs-ACCOUNT_ID-REGION",
-        "arn:aws:s3:::processed-cloudtrail-logs-ACCOUNT_ID-REGION/*"
-      ]
-    }
-  ]
-}
-```
-
-#### 3.2.2 Create CloudWatchFirehoseRole
-
-  - Role name: `CloudWatchFirehoseRole`
-  - Description: `Allows Firehose to write CloudWatch logs to S3`
-  - Trusted entity: Kinesis Firehose
-  - Inline policy name: `FirehosePolicy`
-  - Inline policy JSON:
-
-<!-- end list -->
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetBucketLocation",
-        "s3:ListBucket",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::processed-cloudwatch-logs-ACCOUNT_ID-REGION",
-        "arn:aws:s3:::processed-cloudwatch-logs-ACCOUNT_ID-REGION/*"
-      ]
-    }
-  ]
-}
-```
-
-### 3.3 Create Step Functions Role
-
-#### 3.3.1 Create StepFunctionsRole
-
-1.  **Create role**:
-
-      - **Trusted entity**: Step Functions
-      - **Role name**: `StepFunctionsRole`
-      - **Description**: `Execution role for Incident Response Step Functions`
-
-2.  **Add TWO inline policies**:
-
-**Policy 1: LambdaInvokePolicy**
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "lambda:InvokeFunction",
-      "Resource": [
-        "arn:aws:lambda:REGION:ACCOUNT_ID:function:ir-isolate-ec2-lambda",
-        "arn:aws:lambda:REGION:ACCOUNT_ID:function:ir-parse-findings-lambda",
-        "arn:aws:lambda:REGION:ACCOUNT_ID:function:ir-quarantine-iam-lambda"
-      ]
-    }
-  ]
-}
-```
-
-**Policy 2: EC2AutoScalingPolicy**
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "autoscaling:DescribeAutoScalingInstances",
-        "autoscaling:DetachInstances",
-        "autoscaling:UpdateAutoScalingGroup",
-        "ec2:CreateSnapshot",
-        "ec2:CreateTags",
-        "ec2:DescribeVolumes",
-        "ec2:ModifyInstanceAttribute"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-```
-
-### 3.4 Create EventBridge Role
-
-#### 3.4.1 Create IncidentResponseStepFunctionsEventRole
-
-  - Role name: `IncidentResponseStepFunctionsEventRole`
-  - Description: `Allows EventBridge to trigger Step Functions`
-  - Trusted entity: EventBridge
-  - Inline policy name: `StartStepFunctionsPolicy`
-  - Inline policy JSON:
-
-<!-- end list -->
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "states:StartExecution",
-      "Resource": "arn:aws:states:REGION:ACCOUNT_ID:stateMachine:IncidentResponseStepFunctions"
-    }
-  ]
-}
-```
-
-### 3.5 Create VPC Flow Logs Role
-
-#### 3.5.1 Create FlowLogsIAMRole
-
-1.  **Create role**:
-
-      - **Trusted entity**: EC2 (will edit trust policy)
-      - **Role name**: `FlowLogsIAMRole`
-
-2.  **Edit trust relationship** to:
-
-<!-- end list -->
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "vpc-flow-logs.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-```
-
-3.  **Add inline policy**:
-      - Policy name: `FlowLogsPolicy`
-      - Policy JSON:
-
-<!-- end list -->
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:DescribeLogGroups",
-        "logs:DescribeLogStreams",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-```
-
-### 3.6 Create Glue Role
-
-#### 3.6.1 Create GlueCloudWatchRole
-
-  - Role name: `GlueCloudWatchRole`
-  - Description: `Allows Glue to access S3 and CloudWatch Logs`
-  - Trusted entity: Glue
-  - **Managed policies** (attach 3):
-      - AWSGlueServiceRole
-      - CloudWatchLogsReadOnlyAccess
-      - AmazonS3FullAccess
-  - **No inline policies needed**
-
-### 3.7 Create IAM Quarantine Policy
-
-#### 3.7.1 Create IrQuarantineIAMPolicy
-
-1.  **Navigate to IAM Console** → **Policies** → **Create policy**
-
-2.  **Policy JSON**:
-
-<!-- end list -->
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Deny",
-      "Action": "*",
-      "Resource": "*"
-    }
-  ]
-}
-```
-
-3.  **Policy name**: `IrQuarantineIAMPolicy`
-4.  **Description**: `Deny-all policy for quarantining compromised IAM users`
-
------

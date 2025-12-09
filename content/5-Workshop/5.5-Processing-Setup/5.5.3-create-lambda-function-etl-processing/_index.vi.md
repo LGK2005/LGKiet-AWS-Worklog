@@ -1,95 +1,90 @@
 ---
-title : "VPC Endpoint Policies"
+title : "Tạo Lambda Function - Xử lý ETL"
 date: "2000-01-01"
-weight : 5
+weight : 03
 chapter : false
-pre : " <b> 5.5 </b> "
+pre : " <b> 5.5.3. </b> "
 ---
 
-Khi bạn tạo một Interface Endpoint  hoặc cổng, bạn có thể đính kèm một chính sách điểm cuối để kiểm soát quyền truy cập vào dịch vụ mà bạn đang kết nối. Chính sách VPC Endpoint là chính sách tài nguyên IAM mà bạn đính kèm vào điểm cuối. Nếu bạn không đính kèm chính sách khi tạo điểm cuối, thì AWS sẽ đính kèm chính sách mặc định cho bạn để cho phép toàn quyền truy cập vào dịch vụ thông qua điểm cuối.
 
-Bạn có thể tạo chính sách chỉ hạn chế quyền truy cập vào các S3 bucket cụ thể. Điều này hữu ích nếu bạn chỉ muốn một số Bộ chứa S3 nhất định có thể truy cập được thông qua điểm cuối.
+## Tạo Lambda Functions - Xử lý ETL
 
-Trong phần này, bạn sẽ tạo chính sách VPC Endpoint hạn chế quyền truy cập vào S3 bucket được chỉ định trong chính sách VPC Endpoint.
+Trong phần này, bạn sẽ tạo 5 Lambda functions để xử lý logs và gửi chúng đến Kinesis Firehose hoặc S3.
 
-![endpoint diagram](/images/5-Workshop/5.5-Policy/s3-bucket-policy.png)
+### incident-response-cloudtrail-etl
 
-#### Kết nối tới EC2 và xác minh kết nối tới S3. 
+  - **Runtime**: Python 3.12
+  - **Handler**: `CloudTrailETL.lambda_handler`
+  - **Role**: `CloudTrailETLLambdaServiceRole`
+  - **Timeout**: 300s, Memory: 128MB
+  - **Env**: `FIREHOSE_STREAM_NAME=cloudtrail-firehose-stream`
+  - **Code**: [cloudtrail-etl](../../5.11-Appendices/5.11.1-cloudtrail-etl)
 
-1. Bắt đầu một phiên AWS Session Manager mới trên máy chủ có tên là Test-Gateway-Endpoint. Từ phiên này, xác minh rằng bạn có thể liệt kê nội dung của bucket mà bạn đã tạo trong Phần 1: Truy cập S3 từ VPC.
+### incident-response-guardduty-etl
 
-```
-aws s3 ls s3://<your-bucket-name>
-```
-![test](/images/5-Workshop/5.5-Policy/test1.png)
+  - **Runtime**: Python 3.12
+  - **Handler**: `guardduty_etl.lambda_handler`
+  - **Role**: `GuardDutyETLLambdaServiceRole`
+  - **Timeout**: 300s, Memory: 128MB
+  - **Env**: `DESTINATION_BUCKET`, `S3_LOCATION_GUARDDUTY`, `DATABASE_NAME`, `TABLE_NAME_GUARDDUTY`
+  - **Code**: [guardduty-etl](../../5.11-Appendices/5.11.2-guardduty-etl)
 
-Nội dung của bucket bao gồm hai tệp có dung lượng 1GB đã được tải lên trước đó.
+### cloudwatch-etl-lambda
 
-2. Tạo một bucket S3 mới; tuân thủ mẫu đặt tên mà bạn đã sử dụng trong Phần 1, nhưng thêm '-2' vào tên. Để các trường khác là mặc định và nhấp vào **Create**.
+  - **Runtime**: Python 3.12
+  - **Handler**: `cloudwatch_etl.lambda_handler`
+  - **Role**: `CloudWatchETLLambdaServiceRole`
+  - **Env**: `FIREHOSE_STREAM_NAME=vpc-dns-firehose-stream`
+  - **Code**: [cloudwatch-etl](../../5.11-Appendices/5.11.3-cloudwatch-etl)
 
-![create bucket](/images/5-Workshop/5.5-Policy/create-bucket.png)
+### cloudwatch-eni-etl-lambda
 
-3. Tạo bucket thành công.
+  - **Runtime**: Python 3.12
+  - **Handler**: `cloudwatch_eni_etl.lambda_handler`
+  - **Role**: `CloudWatchENIETLLambdaServiceRole`
+  - **Env**: `FIREHOSE_STREAM_NAME=vpc-flow-firehose-stream`
+  - **Code**: [cloudwatch-eni-etl](../../5.11-Appendices/5.11.4-cloudwatch-eni-etl)
 
-![Success](/images/5-Workshop/5.5-Policy/create-bucket-success.png)
+### cloudwatch-export-lambda
 
-Policy mặc định cho phép truy cập vào tất cả các S3 Buckets thông qua VPC endpoint.
+  - **Runtime**: Python 3.12
+  - **Handler**: `cloudwatch_autoexport.lambda_handler`
+  - **Role**: `CloudWatchExportLambdaServiceRole`
+  - **Env**: `DESTINATION_BUCKET=incident-response-log-list-bucket-ACCOUNT_ID-REGION`
+  - **Code**: [cloudwatch-autoexport](../../5.11-Appendices/5.11.5-cloudwatch-autoexport)
 
-4. Trong giao diện **Edit Policy**, sao chép và dán theo policy sau, thay thế yourbucketname-2 với tên bucket thứ hai của bạn. Policy này sẽ cho phép truy cập đến bucket mới thông qua VPC endpoint, nhưng không cho phép truy cập đến các bucket còn lại. Chọn **Save** để kích hoạt policy.
+## Cấu hình CloudWatch Logs Subscription Filter
 
+### Cấu hình Subscription Filter
 
-```
-{
-  "Id": "Policy1631305502445",
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "Stmt1631305501021",
-      "Action": "s3:*",
-      "Effect": "Allow",
-      "Resource": [
-      				"arn:aws:s3:::yourbucketname-2",
-       				"arn:aws:s3:::yourbucketname-2/*"
-       ],
-      "Principal": "*"
-    }
-  ]
-}
-```
+1.  **Mở CloudWatch Console**.
+2.  Ở ngăn điều hướng bên trái, chọn **Log Management**.
 
-![custom policy](/images/5-Workshop/5.5-Policy/policy2.png)
+3.  Nhấn vào centralized log group: **`/aws/incident-response/centralized-logs`**.
 
-Cấu hình policy thành công.
+4.  **Tạo Subscription Filter**:
+    * Nhấn vào tab **"Subscription filters"**.
+    * Nhấn **"Create Lambda subscription filter"**.
 
-![success](/images/5-Workshop/5.5-Policy/success.png)
+5.  **Cấu hình Destination**:
+    * **Destination Lambda function**: Chọn function **`cloudwatch-export-lambda`**.
+    * **Log format**: Chọn **"Other"**. (Điều này đảm bảo dữ liệu log thô được chuyển đi hiệu quả để Lambda xử lý).
 
-5. Từ session của bạn trên Test-Gateway-Endpoint instance, kiểm tra truy cập đến S3 bucket bạn tạo ở bước đầu
+6.  **Cấu hình Log Format và Filter**:
+    * **Subscription filter name**: Nhập tên mô tả, ví dụ, `VPC-Log-Export-Filter`.
+    * **Filter pattern**: Để trống trường này **blank**. (Đảm bảo tất cả logs trong group đều được xử lý).
 
-```
-aws s3 ls s3://<yourbucketname>
-```
+7.  Nhấn **"Start streaming"**.
+   
+## Cấu hình S3 Event Notifications
 
-Câu lệnh trả về lỗi bởi vì truy cập vào S3 bucket không có quyền trong VPC endpoint policy.
+S3 Console → `incident-response-log-list-bucket-ACCOUNT_ID-REGION` → Properties → Event notifications
 
-![error](/images/5-Workshop/5.5-Policy/error.png)
+Tạo 4 notifications với Event types/Object creation/✅All object create events:
 
-6. Trở lại home directory của bạn trên EC2 instance ```cd~```
+1.  **CloudTrailETLTrigger**: Prefix `AWSLogs/ACCOUNT_ID/CloudTrail/` → Lambda `incident-response-cloudtrail-etl`
+2.  **VPCDNSLogsTrigger**: Prefix `exportedlogs/vpc-dns-logs/` → Lambda `cloudwatch-etl-lambda`
+3.  **VPCFlowLogsTrigger**: Prefix `exportedlogs/vpc-flow-logs/` → Lambda `cloudwatch-eni-etl-lambda`
+4.  **GuardDutyFindingsTrigger**: Prefix `AWSLogs/ACCOUNT_ID/GuardDuty/` → Lambda `incident-response-guardduty-etl`
 
-+ Tạo file ```fallocate -l 1G test-bucket2.xyz ```
-+ Sao chép file lên bucket thứ  2 ```aws s3 cp test-bucket2.xyz s3://<your-2nd-bucket-name>```
-
-![success](/images/5-Workshop/5.5-Policy/test2.png)
-
-Thao tác này được cho phép bởi VPC endpoint policy.
-
-![success](/images/5-Workshop/5.5-Policy/test2-success.png)
-
-Sau đó chúng ta kiểm tra truy cập vào S3 bucket đầu tiên
-
- ```aws s3 cp test-bucket2.xyz s3://<your-1st-bucket-name>```
-
- ![fail](/images/5-Workshop/5.5-Policy/test2-fail.png)
-
- Câu lệnh xảy ra lỗi bởi vì bucket không có quyền truy cập bởi VPC endpoint policy.
-
-Trong phần này, bạn đã tạo chính sách VPC Endpoint cho Amazon S3 và sử dụng AWS CLI để kiểm tra chính sách. Các hoạt động AWS CLI liên quan đến bucket S3 ban đầu của bạn thất bại vì bạn áp dụng một chính sách chỉ cho phép truy cập đến bucket thứ hai mà bạn đã tạo. Các hoạt động AWS CLI nhắm vào bucket thứ hai của bạn thành công vì chính sách cho phép chúng. Những chính sách này có thể hữu ích trong các tình huống khi bạn cần kiểm soát quyền truy cập vào tài nguyên thông qua VPC Endpoint.
+-----

@@ -1,33 +1,26 @@
 ---
 title: "Workshop"
 date: "2000-01-01"
-weight: 5
+weight: 05
 chapter: false
 pre: " <b> 5. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
-
-
-# Đảm bảo truy cập Hybrid an toàn đến S3 bằng cách sử dụng VPC endpoint
+# Thiết lập hệ thống phản hồi sự cố tự động AWS
 
 #### Tổng quan
 
-**AWS PrivateLink** cung cấp kết nối riêng tư đến các dịch vụ aws từ VPCs hoặc trung tâm dữ liệu (on-premise) mà không làm lộ lưu lượng truy cập ra ngoài public internet.
-
-Trong bài lab này, chúng ta sẽ học cách tạo, cấu hình, và kiểm tra VPC endpoints để cho phép workload của bạn tiếp cận các dịch vụ AWS mà không cần đi qua Internet công cộng.
-
-Chúng ta sẽ tạo hai loại endpoints để truy cập đến Amazon S3: gateway vpc endpoint và interface vpc endpoint. Hai loại vpc endpoints này mang đến nhiều lợi ích tùy thuộc vào việc bạn truy cập đến S3 từ môi trường cloud hay từ trung tâm dữ liệu (on-premise).
-+ **Gateway** - Tạo gateway endpoint để gửi lưu lượng đến Amazon S3 hoặc DynamoDB using private IP addresses. Bạn điều hướng lưu lượng từ VPC của bạn đến gateway endpoint bằng các bảng định tuyến (route tables)
-+ **Interface** - Tạo interface endpoint để gửi lưu lượng đến các dịch vụ điểm cuối (endpoints) sử dụng Network Load Balancer để phân phối lưu lượng. Lưu lượng dành cho dịch vụ điểm cuối được resolved bằng DNS.
+Hướng dẫn này cung cấp quy trình từng bước hoàn chỉnh để triển khai hệ thống phản hồi sự cố và điều tra số (forensics) tự động của chúng tôi trên AWS. Hệ thống này tận dụng **CloudTrail**, **GuardDuty**, **VPC Flow Logs**, **Kinesis Firehose**, **Glue**, **Athena**, và **Lambda** functions được điều phối bởi **AWS Step Functions** để tự động phát hiện, phân tích và cách ly các tài nguyên bị xâm phạm như EC2 instances và IAM users. Khả năng điều tra log sâu hơn được bổ sung bằng cách thiết lập **Security Dashboard** lưu trữ trên S3 và truy cập qua **CloudFront** và **Cognito**, truy vấn log sử dụng **API Gateway** và **Lambda**.
 
 #### Nội dung
-
-1. [Tổng quan về workshop](5.1-Workshop-overview/)
-2. [Chuẩn bị](5.2-Prerequiste/)
-3. [Truy cập đến S3 từ VPC](5.3-S3-vpc/)
-4. [Truy cập đến S3 từ TTDL On-premises](5.4-S3-onprem/)
-5. [VPC Endpoint Policies (làm thêm)](5.5-Policy/)
-6. [Dọn dẹp tài nguyên](5.6-Cleanup/)
+1. [Tổng quan](5.1-Workshop-overview/)
+2. [Điều kiện tiên quyết](5.2-Prerequiste/)
+3. [Giai đoạn 1: Thiết lập nền tảng](5.3-Foundation-Setup/)
+4. [Giai đoạn 2: Thiết lập giám sát](5.4-Monitoring-Setup/)
+5. [Giai đoạn 3: Thiết lập xử lý](5.5-Processing-Setup/)
+6. [Giai đoạn 4: Thiết lập tự động hóa](5.6-Automation-Setup/)
+7. [Giai đoạn 5: Thiết lập Dashboard](5.7-Dashboard-Setup/)
+8. [Kiểm tra](5.8-Verify-Setup/)
+9. [Sử dụng CDK](5.9-Use-CDK/)
+10. [Dọn dẹp](5.10-Cleanup/)
+11. [Phụ lục](5.11-Appendices/)

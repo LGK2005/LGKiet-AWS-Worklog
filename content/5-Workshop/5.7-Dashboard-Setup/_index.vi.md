@@ -1,37 +1,18 @@
 ---
-title : "Dọn dẹp tài nguyên"
+title : "Thiết lập Dashboard"
 date: "2000-01-01"
-weight : 6
+weight : 07
 chapter : false
-pre : " <b> 5.6. </b> "
+pre : " <b> 5.7. </b> "
 ---
 
-#### Dọn dẹp tài nguyên
+Hướng dẫn này sẽ chỉ cho bạn cách thiết lập security dashboard. Security dashboard sẽ sử dụng S3 để chứa các file và thư mục web, Lambda để truy vấn dữ liệu bằng Athena, API Gateway để định tuyến api tới Lambda và Cloudfront để caching và truy cập web bằng URL của nó.
 
-Xin chúc mừng bạn đã hoàn thành xong lab này!
-Trong lab này, bạn đã học về các mô hình kiến trúc để truy cập Amazon S3 mà không sử dụng Public Internet.
+-----
+#### Nội dung
 
-+ Bằng cách tạo Gateway endpoint, bạn đã cho phép giao tiếp trực tiếp giữa các tài nguyên EC2 và Amazon S3, mà không đi qua Internet Gateway.
-Bằng cách tạo Interface endpoint, bạn đã mở rộng kết nối S3 đến các tài nguyên chạy trên trung tâm dữ liệu trên chỗ của bạn thông qua AWS Site-to-Site VPN hoặc Direct Connect.
-
-#### Dọn dẹp
-1. Điều hướng đến Hosted Zones trên phía trái của bảng điều khiển Route 53. Nhấp vào tên của  s3.us-east-1.amazonaws.com zone. Nhấp vào Delete và xác nhận việc xóa bằng cách nhập từ khóa "delete".
-
-![hosted zone](/images/5-Workshop/5.6-Cleanup/delete-zone.png)
-
-2. Disassociate Route 53 Resolver Rule - myS3Rule from "VPC Onprem" and Delete it. 
-
-![hosted zone](/images/5-Workshop/5.6-Cleanup/vpc.png)
-
-4.Mở console của CloudFormation và xóa hai stack CloudFormation mà bạn đã tạo cho bài thực hành này:
-+ PLOnpremSetup
-+ PLCloudSetup
-
-![delete stack](/images/5-Workshop/5.6-Cleanup/delete-stack.png)
-
-5. Xóa các S3 bucket
-
-+ Mở bảng điều khiển S3
-+ Chọn bucket chúng ta đã tạo cho lab, nhấp chuột và xác nhận là empty. Nhấp Delete và xác nhận delete.
-+ 
-![delete s3](/images/5-Workshop/5.6-Cleanup/delete-s3.png)
+- [Thiết lập S3](5.7.1-Setup-S3/)
+- [Thiết lập Lambda](5.7.2-Setup-Lambda/)
+- [Thiết lập API Gateway](5.7.3-Setup-API-Gateway/)
+- [Thiết lập Cloudfront](5.7.4-Setup-Cloudfront/)
+- [Thiết lập Cognito](5.7.5-Setup-Cognito/)

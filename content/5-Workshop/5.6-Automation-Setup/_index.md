@@ -25,46 +25,54 @@ pre : " <b> 5.6. </b> "
 2.  **Type**: Standard, **Name**: `IncidentResponseAlerts`
 3.  **Access policy**:
 
-<!-- end list -->
 
 ```json
 {
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Sid": "AllowEventBridgePublish",
+      "Sid": "0",
       "Effect": "Allow",
       "Principal": {
         "Service": "events.amazonaws.com"
       },
       "Action": "sns:Publish",
-      "Resource": "arn:aws:sns:REGION:ACCOUNT_ID:IncidentResponseAlerts"
+      "Resource": "arn:aws:sns:ap-southeast-1:831981618496:IncidentResponseAlerts"
+    },
+    {
+      "Sid": "AWSEvents_IncidentResponseAlert_Target0",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "events.amazonaws.com"
+      },
+      "Action": "SNS:Publish",
+      "Resource": "arn:aws:sns:ap-southeast-1:831981618496:IncidentResponseAlerts"
     }
   ]
 }
 ```
-
+![alt text](</images/5-Workshop/Workshop pic/25.png>)
 ## Create Lambda Functions - Incident Response
 
 ### ir-parse-findings-lambda
 
   - **Handler**: `parse_findings.lambda_handler`
   - **Role**: `ParseFindingsLambdaServiceRole`
-  - **Code**: Appendix A.6
+  - **Code**: [parse-findings](../5.11-Appendices/5.11-Appendices/5.11.6-parse-findings)
 
 ### ir-isolate-ec2-lambda
 
   - **Handler**: `isolate_ec2.lambda_handler`
   - **Role**: `IsolateEC2LambdaServiceRole`
   - **Env**: `ISOLATION_SG_ID=sg-XXXXXXX` (from step 12)
-  - **Code**: Appendix A.7
+  - **Code**: [isolate-ec2](../5.11-Appendices/5.11-Appendices/5.11.7-isolate-ec2)
 
 ### ir-quarantine-iam-lambda
 
   - **Handler**: `quarantine_iam.lambda_handler`
   - **Role**: `QuarantineIAMLambdaServiceRole`
   - **Env**: `QUARANTINE_POLICY_ARN=arn:aws:iam::ACCOUNT_ID:policy/IrQuarantineIAMPolicy`
-  - **Code**: Appendix A.8
+  - **Code**: [quarantine-iam](../5.11-Appendices/5.11-Appendices/5.11.8-quarantine-iam)
 
 ### ir-alert-dispatch
 
@@ -72,7 +80,7 @@ pre : " <b> 5.6. </b> "
   - **Role**: `AlertDispatchLambdaServiceRole`
   - **Env**: `SENDER_EMAIL`, `RECIPIENT_EMAIL`, `SLACK_WEBHOOK_URL`
   - **Add SNS trigger**: Topic `IncidentResponseAlerts`
-  - **Code**: Appendix A.9
+  - **Code**: [alert-dispatch](../5.11-Appendices/5.11-Appendices/5.11.9-alert-dispatch)
 
 ## Update SNS Topic Subscription
 
@@ -93,8 +101,6 @@ pre : " <b> 5.6. </b> "
 2.  **Name**: `IncidentResponseAlert`
 3.  **Event pattern**:
 
-<!-- end list -->
-
 ```json
 {
   "source": ["aws.guardduty"],
@@ -106,7 +112,7 @@ pre : " <b> 5.6. </b> "
       - **SNS topic**: `IncidentResponseAlerts`
       - **Step Functions**: `IncidentResponseStepFunctions` with role `IncidentResponseStepFunctionsEventRole`
 
-## 18\. Configure Athena Workgroup
+## Configure Athena Workgroup
 
 1.  **Athena Console** → **Workgroups** → `primary` → **Edit**
 2.  **Query result location**: `s3://athena-query-results-ACCOUNT_ID-REGION/`

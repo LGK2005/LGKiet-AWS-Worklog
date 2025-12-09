@@ -7,11 +7,11 @@ chapter: false
 
 # Báo cáo thực tập
 ### Thông tin sinh viên:
-&emsp; **Họ và tên:** Huỳnh An Khương
+&emsp; **Họ và tên:** Lâm Gia Kiệt
 
-&emsp; **Số điện thoại:** 0964443042
+&emsp; **Số điện thoại:** 0886659957
 
-&emsp; **Email:** huynhankhuong0511@gmail.com
+&emsp; **Email:** lamgiakiet2005@gmail.com
 
 &emsp; **Trường:** Trường Đại học FPT Thành Phố Hồ Chí Minh
 
@@ -25,7 +25,7 @@ chapter: false
 
 &emsp; **Thời gian thực tập:** Từ ngày 12/08/2025 đến ngày 12/11/2025
 
-![Ảnh đại diện của bạn](/images/avatar.png)
+{{< figure src="/images/profileImage.jpg" width="600" >}}
 
 
 

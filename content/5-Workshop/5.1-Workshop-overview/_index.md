@@ -1,5 +1,5 @@
 ---
-title : "Introduction"
+title : "Overview"
 date: "2000-01-01" 
 weight : 1 
 chapter : false
@@ -17,3 +17,4 @@ In this workshop, you will deploy a multi-phase system to achieve end-to-end sec
 + **Monitoring Setup**: Enabling and configuring key security logs (CloudTrail, GuardDuty, VPC Flow Logs) to direct data to the central log ingestion point.
 + **Processing Setup**: Deploying Kinesis Firehose, Lambda ETLs, and Glue/Athena tables to transform raw logs into an easily queryable security data lake.
 + **Automation Setup**: Creating the **Isolation Security Group**, **SNS Topic**, **Incident Response Lambda Functions**, and the **Step Functions State Machine** that executes automatic quarantine actions when GuardDuty detects findings.
++ **Dashboard Setup**: Hosting a secure, **S3-based static web interface** accelerated by **CloudFront** and protected by **Cognito** to provide analysts with real-time visualization of **forensic data** and direct query capabilities via **API Gateway**.

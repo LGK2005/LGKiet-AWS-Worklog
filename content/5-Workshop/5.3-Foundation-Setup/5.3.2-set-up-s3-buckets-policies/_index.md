@@ -13,18 +13,16 @@ In this section, you will configure the bucket policy for the primary log bucket
 1. **Navigate to the primary log bucket**:
    - In S3 Console, click on `incident-response-log-list-bucket-ACCOUNT_ID-REGION`
 
-   > [Screenshot: S3 Console with primary log bucket selected]
+![alt text](</images/5-Workshop/Workshop pic/7 open bucket 5.3.2.png>)
 
 2. **Open the Permissions tab**:
    - Click on the **"Permissions"** tab
-
-   > [Screenshot: S3 Bucket Permissions tab]
 
 3. **Scroll to Bucket policy**:
    - Scroll down to the **"Bucket policy"** section
    - Click **"Edit"**
 
-   > [Screenshot: S3 Bucket policy section with Edit button]
+![alt text](</images/5-Workshop/Workshop pic/9 policy edit.png>)
 
 4. **Paste the bucket policy**:
    - Copy the following JSON policy
@@ -145,4 +143,4 @@ In this section, you will configure the bucket policy for the primary log bucket
 
 6.  **Verify policy is saved**: You should see the policy displayed in the Bucket policy section
 
-    > [Screenshot: S3 Bucket policy section showing saved policy]
+![alt text](</images/5-Workshop/Workshop pic/10 confirm successful 5.3.2.png>)

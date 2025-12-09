@@ -1,58 +1,82 @@
 ---
-title : "Chuẩn bị tài nguyên"
+title : "Thiết lập S3 buckets"
 date: "2000-01-01"
-weight : 1
+weight : 01
 chapter : false
-pre : " <b> 5.4.1 </b> "
+pre : " <b> 5.3.1. </b> "
 ---
 
-Để chuẩn bị cho phần này của workshop, bạn sẽ cần phải:
-+ Triển khai CloudFormation stack
-+ Sửa đổi bảng định tuyến VPC.
+Trong phần này, bạn sẽ tạo 5 S3 buckets phục vụ làm nền tảng cho hệ thống Phản hồi Sự cố Tự động (Auto Incident Response system).
 
-Các thành phần này hoạt động cùng nhau để mô phỏng DNS forwarding và name resolution.
+**Quan trọng**: Thay thế `ACCOUNT_ID` bằng AWS Account ID của bạn và `REGION` bằng region mục tiêu của bạn (ví dụ: us-east-1) trong tất cả các tên bucket.
 
-#### Triển khai CloudFormation stack
+### Tên Bucket
 
-Mẫu CloudFormation sẽ tạo các dịch vụ bổ sung để hỗ trợ mô phỏng môi trường truyền thống:
-+ Một Route 53 Private Hosted Zone lưu trữ các bản ghi Bí danh (Alias records) cho điểm cuối PrivateLink S3
-+ Một Route 53 Inbound Resolver endpoint cho phép "VPC Cloud" giải quyết các yêu cầu resolve DNS gửi đến Private Hosted Zone
-+ Một Route 53 Outbound Resolver endpoint cho phép "VPC On-prem" chuyển tiếp các yêu cầu DNS cho S3 sang "VPC Cloud"
+1. **incident-response-log-list-bucket-ACCOUNT_ID-REGION** - Bucket thu thập log chính
+2. **processed-cloudtrail-logs-ACCOUNT_ID-REGION** - Lưu trữ CloudTrail logs đã xử lý
+3. **athena-query-results-ACCOUNT_ID-REGION** - Lưu trữ kết quả truy vấn Athena
+4. **processed-cloudwatch-logs-ACCOUNT_ID-REGION** - Lưu trữ CloudWatch logs đã xử lý
+5. **processed-guardduty-findings-ACCOUNT_ID-REGION** - Lưu trữ GuardDuty findings đã xử lý
 
-![route 53 diagram](/images/5-Workshop/5.4-S3-onprem/route53.png)
+### Hướng dẫn tạo Bucket
 
-1. Click link sau để mở [AWS CloudFormation console](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=https://s3.amazonaws.com/reinvent-endpoints-builders-session/R53CF.yaml&stackName=PLOnpremSetup). Mẫu yêu cầu sẽ được tải sẵn vào menu. Chấp nhận tất cả mặc định và nhấp vào Tạo stack.
+1. **Mở Amazon S3 Console**
+   - Truy cập https://console.aws.amazon.com/s3/
+   - Hoặc: AWS Management Console → Services → S3
 
-![Create stack](/images/5-Workshop/5.4-S3-onprem/create-stack.png)
+![alt text](</images/5-Workshop/Workshop pic/1 S3 console 5.3.1.png>)
 
-![Button](/images/5-Workshop/5.4-S3-onprem/create-stack-button.png)
+2. **Nhấn vào "Create bucket"**
+3. **Cấu hình chung**:
+   - **Bucket name**: Nhập `incident-response-log-list-bucket-ACCOUNT_ID-REGION`
+     - Ví dụ: `incident-response-log-list-bucket-123456789012-us-east-1`
+   - **AWS Region**: Chọn region mục tiêu của bạn (ví dụ: US East (N. Virginia) us-east-1)
 
-Có thể mất vài phút để triển khai stack hoàn tất. Bạn có thể tiếp tục với bước tiếp theo mà không cần đợi quá trình triển khai kết thúc.
+![alt text](</images/5-Workshop/Workshop pic/2 S3 name 5.3.1.png>)
 
-####  Cập nhật bảng định tuyến private on-premise 
+4. **Object Ownership**:
+   - Giữ mặc định: **ACLs disabled (recommended)**
 
-Workshop này sử dụng StrongSwan VPN chạy trên EC2 instance để mô phỏng khả năng kết nối giữa trung tâm dữ liệu truyền thống và môi trường cloud AWS. Hầu hết các thành phần bắt buộc đều được cung cấp trước khi bạn bắt đầu. Để hoàn tất cấu hình VPN, bạn sẽ sửa đổi bảng định tuyến "VPC on-prem" để hướng lưu lượng đến cloud đi qua StrongSwan VPN instance.
+5. **Cài đặt Block Public Access cho bucket này**:
+   - Chọn **"Block all public access"**
+   - Đảm bảo tất cả 4 tùy chọn phụ đều được chọn:
+     - ✓ Block public access to buckets and objects granted through new access control lists (ACLs)
+     - ✓ Block public access to buckets and objects granted through any access control lists (ACLs)
+     - ✓ Block public access to buckets and objects granted through new public bucket or access point policies
+     - ✓ Block public and cross-account access to buckets and objects through any public bucket or access point policies
 
-1. Mở Amazon EC2 console 
+6. **Bucket Versioning**:
+   - Chọn **"Enable"**
 
-2. Chọn instance tên infra-vpngw-test. Từ Details tab, copy Instance ID và paste vào text editor của bạn để sử dụng ở những bước tiếp theo
+![alt text](</images/5-Workshop/Workshop pic/3 Bucket versioning 5.3.1.png>)
 
-![ec2 id](/images/5-Workshop/5.4-S3-onprem/ec2-onprem-id.png)
+7. **Tags** (tùy chọn):
+   - Thêm tags nếu muốn
+   - Ví dụ: Key=`Purpose`, Value=`IncidentResponse`
 
-3. Đi đến VPC menu bằng cách gõ "VPC" vào Search box
+8. **Mã hóa mặc định (Default encryption)**:
+   - **Encryption type**: Chọn **"Server-side encryption with Amazon S3 managed keys (SSE-S3)"**
+   - **Bucket Key**: Giữ mặc định (**Enabled**)
 
-4. Click vào Route Tables, chọn RT Private On-prem route table, chọn Routes tab, và click Edit Routes.
+9. **Cài đặt nâng cao (Advanced settings)**:
+   - Giữ nguyên tất cả mặc định
 
-![rt](/images/5-Workshop/5.4-S3-onprem/rt.png)
+10. **Nhấn "Create bucket"**
 
-5. Click Add route.
-+ Destination: CIDR block của Cloud VPC
-+ Target: ID của infra-vpngw-test instance (bạn đã lưu lại ở bước trên)
+11. **Xác minh tạo bucket**:
+    - Bạn sẽ thấy thông báo thành công
+    - Bucket sẽ xuất hiện trong danh sách S3 buckets của bạn
 
-![add route](/images/5-Workshop/5.4-S3-onprem/add-route.png)
+![alt text](</images/5-Workshop/Workshop pic/5 Bucket create succesfull 5.3.1 .png>)
 
-6. Click Save changes
+12. **Lặp lại các bước 2-10 cho 4 buckets còn lại**:
+    - `processed-cloudtrail-logs-ACCOUNT_ID-REGION`
+    - `athena-query-results-ACCOUNT_ID-REGION`
+    - `processed-cloudwatch-logs-ACCOUNT_ID-REGION`
+    - `processed-guardduty-findings-ACCOUNT_ID-REGION`
 
+13. **Xác minh tất cả 5 buckets đã được tạo**:
+    - Điều hướng đến S3 Console
+    - Bạn sẽ thấy tất cả 5 buckets được liệt kê
 
-
-
+![alt text](</images/5-Workshop/Workshop pic/6 check for 5 bucket.png>)
