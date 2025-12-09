@@ -9,11 +9,11 @@ chapter: false
 # Internship Report
 
 ### Student Information:
-&emsp; **Full Name:** Huynh An Khuong
+&emsp; **Full Name:** Lam Gia Kiet
 
-&emsp; **Phone Number:** 0964440342
+&emsp; **Phone Number:** 0886659957
 
-&emsp; **Email:** huynhankhuong0511@gmail.com
+&emsp; **Email:** lamgiakiet2005@gmail.com
 
 &emsp; **University:** FPTU Ho Chi Minh Campus
 
@@ -25,7 +25,7 @@ chapter: false
 
 &emsp; **Internship Duration:** From 08/09/2025 to 12/12/2025
 
-![Your profile picture](/images/profileImage.jpg)
+{{< figure src="/images/profileImage.jpg" width="600" >}}
 
 ### Report Content
 
