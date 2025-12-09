@@ -32,7 +32,7 @@ In this guide, you will setup IAM Role and Policy for Lambda.
    - Check the box next to **"AWSLambdaBasicExecutionRole"**
    - Click **"Next"**
 
-    ![Screenshot: IAM Create role - Add permissions](/static/images/5-Workshop/5.7-Dashboard-setup/5.7.2-lambda-setup/lambda_iam_role_2.png)
+    ![Screenshot: IAM Create role - Add permissions](/images/5-Workshop/5.7-Dashboard-setup/5.7.2-lambda-setup/lambda_iam_role_2.png)
     
 5.  **Name, review, and create**:
 

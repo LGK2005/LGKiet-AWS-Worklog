@@ -91,7 +91,7 @@ pre : " <b> 5.6. </b> "
 
 1.  **Step Functions Console** → **Create state machine**
 2.  **Type**: Standard, **Name**: `IncidentResponseStepFunctions`
-3.  **Definition**: Dán JSON từ Phụ lục B (thay thế `ACCOUNT_ID/REGION`)
+3.  **Definition**: [Step Functions Definition](../5.11-Appendices/5.11.10-step-functions-state-machine-definition)
 4.  **Role**: `StepFunctionsRole`
 5.  **Create**
 

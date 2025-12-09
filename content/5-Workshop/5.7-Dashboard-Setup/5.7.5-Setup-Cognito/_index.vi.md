@@ -21,7 +21,7 @@ Trong hướng dẫn này, bạn sẽ tạo một Cognito user pool để đăng
      - Application type: **Single-page application (SPA)**
      - Application name: **dashboard-user-pool-client**
      - Options for sign-in identifiers: **Email** và **Username**
-     - Self-registration: **Enable slef-registration**
+     - Self-registration: **Enable self-registration**
      - Required attributes for sign-up: **email**
      - Add a return URL: Vào Cloudfront, chọn cái bạn vừa tạo và copy **Distribution domain name** và dán vào đây (Ví dụ: `https://d2bvvvpr6s4eyd.cloudfront.net`)
      - Nhấn **Create user directory**
@@ -38,7 +38,6 @@ Trong hướng dẫn này, bạn sẽ tạo một Cognito user pool để đăng
    - Chọn **dashboard-user-pool-client**
    - Trong phần **App client information**, nhấn **Edit**
    - Thay đổi cài đặt như hình bên dưới:
-        > [Screenshot: Cognito Console Homepage]
    - Nhấn **Save change**
 
     ![Screenshot: Cognito Console Homepage](/images/5-Workshop/5.7-Dashboard-setup/5.7.5-cognito-setup/cognito_app_client_select.png)

@@ -21,7 +21,7 @@ In this guide, you will create a Cognito user pool for dashboard login.
      - Application type: **Single-page application (SPA)**
      - Application name: **dashboard-user-pool-client**
      - Options for sign-in identifiers: **Email** and **Username**
-     - Self-registration: **Enable slef-registration**
+     - Self-registration: **Enable self-registration**
      - Required attributes for sign-up: **email**
      - Add a return URL: Go to Cloudfront, choose the one that you just created and copy the **Distribution domain name** and paste it here (Example: `https://d2bvvvpr6s4eyd.cloudfront.net`)
      - Click **Create user directory**
@@ -38,7 +38,6 @@ In this guide, you will create a Cognito user pool for dashboard login.
    - Choose **dashboard-user-pool-client**
    - In **App client information** section, click **Edit**
    - Change the setting like the image below:
-        > [Screenshot: Cognito Console Homepage]
    - Click **Save change**
 
     ![Screenshot: Cognito Console Homepage](/images/5-Workshop/5.7-Dashboard-setup/5.7.5-cognito-setup/cognito_app_client_select.png)

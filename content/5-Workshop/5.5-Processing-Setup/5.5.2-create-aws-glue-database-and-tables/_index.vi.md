@@ -144,16 +144,12 @@ CREATE EXTERNAL TABLE IF NOT EXISTS security_logs.processed_guardduty (
   `principal_id` string,
   `user_name` string,
   `s3_bucket_name` string,
-  `date` string,
   `service_raw` string,
   `resource_raw` string,
   `metadata_raw` string
 )
 PARTITIONED BY (
-  `type` string,
-  `year` string,
-  `month` string,
-  `day` string
+  `date` string
 )
 ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
 WITH SERDEPROPERTIES (
@@ -162,7 +158,14 @@ WITH SERDEPROPERTIES (
 LOCATION 's3://processed-guardduty-findings-ACCOUNT_ID-REGION/processed-guardduty/'
 TBLPROPERTIES (
   'classification' = 'json',
-  'compressionType' = 'gzip'
+  'compressionType' = 'gzip',
+  'projection.enabled' = 'true',
+  'projection.date.type' = 'date',
+  'projection.date.range' = '2025-01-01,NOW',
+  'projection.date.format' = 'yyyy-MM-dd',
+  'projection.date.interval' = '1',
+  'projection.date.interval.unit' = 'DAYS',
+  'storage.location.template' = 's3://processed-guardduty-findings-ACCOUNT_ID-REGION/processed-guardduty/date=${date}/'
 );
 ```
 
