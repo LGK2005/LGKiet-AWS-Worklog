@@ -113,68 +113,78 @@ Hoàn thành các bước sau để tạo Lambda function:
 
 12. Ở tab **Code** của Lambda function, thay code mặc định bằng đoạn mã Node.js sau. Đảm bảo cập nhật phần giữ chỗ với các giá trị thích hợp—chẳng hạn như thay thế ses-verified-email@example.com bằng địa chỉ email Amazon SES đã được xác minh của bạn. Ngoài ra, hãy đảm bảo rằng vai trò IAM mà EventBridge Scheduler sử dụng có quyền ses:SendEmail.
 
-| import { SchedulerClient, CreateScheduleCommand } from "@aws-sdk/client-scheduler";
-const client \= new SchedulerClient({ region: \> }); // vd: eu-west-1
-export const handler \= async (event) \=\> {
+```
+import { SchedulerClient, CreateScheduleCommand } from "@aws-sdk/client-scheduler";
+
+const client = new SchedulerClient({ region: "eu-west-1" }); 
+
+export const handler = async (event) => {
   try {
     for (const record of event.Records) {
-      let params \= {
+      let params = {
         eventID: record.eventID,
         sequenceNumber: record.dynamodb.SequenceNumber,
-        email: record.dynamodb.email,           // Email gửi
-        subject: "Time for your appointment",   // Chủ đề email
-        reminderTS: record.dynamodb.NewImage.REMINDER\_TIMESTAMP.S, // Thời gian nhắc nhở (ISO)
+        email: record.dynamodb.NewImage.email.S,           
+        subject: "Time for your appointment",   
+        reminderTS: record.dynamodb.NewImage.REMINDER_TIMESTAMP.S, // Expects ISO format
       };
-      params.body \= "This is the email body, you have a reminder"; // Nội dung
+      
+      params.body = "This is the email body, you have a reminder"; 
+      
       await scheduleEmail(params);
     }
-    const response \= {
+    
+    return {
       statusCode: 200,
       body: JSON.stringify('Complete'),
     };
-    return response;
   } catch (error) {
     console.error("Error processing event: ", error);
-    const response \= {
+    return {
       statusCode: 500,
       body: JSON.stringify({ message: 'Error processing event', error: error.message }),
     };
-    return response;
   }
 };
-const scheduleEmail \= async (params) \=\> {
+
+const scheduleEmail = async (params) => {
   try {
-    const sesParams \= {
-      Destination: { ToAddresses: \[params.email\] },
+    const sesParams = {
+      Destination: { ToAddresses: [params.email] },
       Message: {
         Body: { Text: { Data: params.body } },
         Subject: { Data: params.subject },
       },
-      Source: "ses-verified-email@example.com", // Email gửi xác thực
+      Source: "ses-verified-email@example.com",
     };
-    const target \= {
-      RoleArn: \>,    // vd: arn:aws:iam::XXXX:role/SchedulerRole
-      Arn: \>,        // vd: "arn:aws:scheduler:::aws-sdk:ses:sendEmail",
+
+    const target = {
+      RoleArn: "arn:aws:iam::YOUR_ACCOUNT_ID:role/YourSchedulerRole", 
+      
+      Arn: "arn:aws:scheduler:::aws-sdk:ses:sendEmail",
+      
       Input: JSON.stringify(sesParams),
-      DeadLetterConfig: { Arn: \> } // vd: arn:aws:sqs:eu-west-1:XXXX:Appointment-DLQ
     };
-    const schedulerInput \= {
-      Name: params.eventID,
+
+    const schedulerInput = {
+      Name: `Appointment_Reminder_${params.eventID}`,
       FlexibleTimeWindow: { Mode: "OFF" },
       ActionAfterCompletion: "DELETE",
       Target: target,
-      ScheduleExpression: \`at(${params.reminderTS})\`,
+      ScheduleExpression: `at(${params.reminderTS})`,
       ClientToken: params.sequenceNumber,
     };
-    const command \= new CreateScheduleCommand(schedulerInput);
-    const result \= await client.send(command);
+
+    const command = new CreateScheduleCommand(schedulerInput);
+    const result = await client.send(command);
     return result;
+
   } catch (error) {
     console.error("Error scheduling email: ", error);
-    throw new Error(\`Failed to schedule email: ${error.message}\`);
+    throw new Error(`Failed to schedule email: ${error.message}`);
   }
-}; |
-| :---- |
+};
+```
 
 13. Chọn **Deploy** để triển khai code mới nhất.
 
@@ -184,14 +194,17 @@ Mẹo: Để cải thiện độ tin cậy và khả năng theo dõi, bạn có 
 
 Chạy lệnh AWS CLI sau để mô phỏng hoạt động ghi vào DynamoDB table của bạn. Vòng lặp này chèn 10 items mẫu vào bảng, mỗi mục có một khóa phân vùng duy nhất (PK) và một khóa sắp xếp tĩnh (SK). Mỗi mục bao gồm REMINDER\_TIMESTAMP được đặt thành 3 phút kể từ thời điểm hiện tại và địa chỉ email kiểm tra. Những lần ghi này sẽ kích hoạt DynamoDB Stream, luồng này gọi Lambda function của bạn để lên lịch gửi email nhắc nhở thông qua EventBridge Scheduler. Hãy nhớ thay thế abc@example.com bằng địa chỉ email hợp lệ, đã được xác minh trong Amazon SES để quan sát toàn bộ quy trình của giải pháp.
 
-| \#\!/bin/bash
+```
+#!/bin/bash
 TABLE="Appointment-Table"
-for PK\_VALUE in {1..10} ; do
-  ISO\_TIMESTAMP\_PLUS\_3\_MINS=$(date \-v+3M \-u \+"%Y-%m-%dT%H:%M:%S")
-  aws dynamodb put-item \--table-name $TABLE \\
-    \--item '{"PK": {"S": "'$PK\_VALUE'"}, "SK": {"S": "StaticSK"}, "REMINDER\_TIMESTAMP": {"S": "'$ISO\_TIMESTAMP\_PLUS\_3\_MINS'"}, "email": {"S": "abc@example.com"}, "ATTR\_1": {"S": "This is a static attribute"}}'
-done |
-| :---- |
+
+for PK_VALUE in {1..10}; do
+  ISO_TIMESTAMP_PLUS_3_MINS=$(date -v+3M -u +"%Y-%m-%dT%H:%M:%S")
+  
+  aws dynamodb put-item --table-name $TABLE \
+    --item '{"PK": {"S": "'$PK_VALUE'"}, "SK": {"S": "StaticSK"}, "REMINDER_TIMESTAMP": {"S": "'$ISO_TIMESTAMP_PLUS_3_MINS'"}, "email": {"S": "abc@example.com"}, "ATTR_1": {"S": "This is a static attribute"}}'
+done
+```
 
 Để theo dõi các email nhắc nhở đang được gửi, hãy điều hướng đến **Monitoring** tab của EventBridge schedule group. Bạn có thể xem các sự kiện được EventBridge Scheduler gọi vào một thời điểm cụ thể bằng cách xem số liệu InvocationAttemptCount. Trong trường hợp của chúng ta, lời gọi là các email nhắc nhở cuộc hẹn tới người dùng thông qua Amazon SES. Để có danh sách tất cả số liệu có sẵn cho một schedule group, tham khảo [Monitoring Amazon EventBridge Scheduler with Amazon CloudWatch](https://docs.aws.amazon.com/scheduler/latest/UserGuide/monitoring-cloudwatch.html).
 
@@ -219,22 +232,18 @@ Trong loạt bài gồm ba phần này, chúng ta đã khám phá cách mở r�
 
 **Về các tác giả**
 
-| Lee Hannigan [Lee](https://www.linkedin.com/in/lee-hannigan/) Hannigan là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Donegal, Ireland. Anh có chuyên môn sâu rộng về các hệ thống phân tán (distributed systems), cùng nền tảng vững chắc về các công nghệ dữ liệu lớn (big data) và phân tích (analytics technologies). Trong vai trò Chuyên gia giải pháp DynamoDB, Lee xuất sắc trong việc hỗ trợ khách hàng thiết kế, đánh giá và tối ưu hóa khối lượng công việc (workloads) sử dụng các khả năng của DynamoDB. |
+| ![][image8] Lee Hannigan [Lee](https://www.linkedin.com/in/lee-hannigan/) Hannigan là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Donegal, Ireland. Anh có chuyên môn sâu rộng về các hệ thống phân tán (distributed systems), cùng nền tảng vững chắc về các công nghệ dữ liệu lớn (big data) và phân tích (analytics technologies). Trong vai trò Chuyên gia giải pháp DynamoDB, Lee xuất sắc trong việc hỗ trợ khách hàng thiết kế, đánh giá và tối ưu hóa khối lượng công việc (workloads) sử dụng các khả năng của DynamoDB. |
 | :---- |
 
-| Aman Dhingra [Aman](https://www.linkedin.com/in/amdhing/) Dhingra là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Dublin, Ireland. Anh có đam mê về các hệ thống phân tán (distributed systems) và nền tảng chuyên sâu về dữ liệu lớn & phân tích (big data & analytics). Aman là tác giả của cuốn "Amazon DynamoDB – The Definitive Guide" và hỗ trợ khách hàng trong việc thiết kế, đánh giá và tối ưu hóa khối lượng công việc vận hành trên Amazon DynamoDB. |
+| ![][image9] Aman Dhingra [Aman](https://www.linkedin.com/in/amdhing/) Dhingra là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Dublin, Ireland. Anh có đam mê về các hệ thống phân tán (distributed systems) và nền tảng chuyên sâu về dữ liệu lớn & phân tích (big data & analytics). Aman là tác giả của cuốn "Amazon DynamoDB – The Definitive Guide" và hỗ trợ khách hàng trong việc thiết kế, đánh giá và tối ưu hóa khối lượng công việc vận hành trên Amazon DynamoDB. |
 | :---- |
 
-[image1]:
-
-[image2]:
-
-[image3]:
-
-[image4]:
-
-[image5]: 
-
-[image6]:
-
-[image7]:
+[image1]: /images/3-Blog/Blog-3/image_1.png
+[image2]: /images/3-Blog/Blog-3/image_2.png
+[image3]: /images/3-Blog/Blog-3/image_3.png
+[image4]: /images/3-Blog/Blog-3/image_4.png
+[image5]: /images/3-Blog/Blog-3/image_5.png
+[image6]: /images/3-Blog/Blog-3/image_6.png
+[image7]: /images/3-Blog/Blog-3/image_7.png
+[image8]: /images/3-Blog/Blog-1/image_11.png
+[image9]: /images/3-Blog/Blog-1/image_12.png

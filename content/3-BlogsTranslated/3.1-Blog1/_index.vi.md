@@ -131,9 +131,10 @@ Trước khi triển khai giải pháp này, bạn nên có:
 
 EventBridge Scheduler cần quyền thích hợp để gọi DynamoDB DeleteItem API. [Tạo một role﻿ IAM](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create.html) với trust policy﻿ sau:
 
-| {
+```
+{
   "Version": "2012-10-17",
-  "Statement": \[
+  "Statement":
     {
       "Effect": "Allow",
       "Principal": {
@@ -141,23 +142,22 @@ EventBridge Scheduler cần quyền thích hợp để gọi DynamoDB DeleteItem
       },
       "Action": "sts:AssumeRole"
     }
-  \]
-} |
-| :---- |
+}
+```
 
 Và đính kèm một policy﻿ với các quyền sau:
 
-| {
+```
+{
   "Version": "2012-10-17",
-  "Statement": \[
+  "Statement":
     {
       "Effect": "Allow",
       "Action": "dynamodb:DeleteItem",
       "Resource": "arn:aws:dynamodb:\[REGION\_NAME\]:\[ACCOUNT\_ID\]:table/\[TABLE\_NAME\]"
     }
-  \]
-} |
-| :---- |
+}
+```
 
 Ghi chú ARN cho role﻿ này, vì chúng ta sẽ cần nó sau này.
 
@@ -189,57 +189,58 @@ Lambda function có trách nhiệm cấu hình EventBridge Scheduler để thự
 
 11. Chuyển từ giao diện Visual sang JSON và thêm chính sách sau, cấp quyền cho Lambda function truy cập DynamoDB Stream (nhớ nhập ARN DynamoDB Stream đã note trước đó) và tạo, cập nhật, xóa EventBridge Schedules:
 
-| {
+```
+{
   "Version": "2012-10-17",
-  "Statement": \[
+  "Statement": [
     {
       "Sid": "DynamoDBStreamAccess",
       "Effect": "Allow",
-      "Action": \[
+      "Action": [
         "dynamodb:GetShardIterator",
         "dynamodb:DescribeStream",
         "dynamodb:GetRecords"
-      \],
-      "Resource": "\[Your DynamoDB Stream ARN\]"
+      ],
+      "Resource": "[Your DynamoDB Stream ARN]"
     },
     {
       "Sid": "DynamoDBListStreams",
       "Effect": "Allow",
       "Action": "dynamodb:ListStreams",
-      "Resource": "\*"
+      "Resource": "*"
     },
     {
       "Sid": "EventBridgeSchedulerAccess",
       "Effect": "Allow",
-      "Action": \[
+      "Action": [
         "scheduler:CreateSchedule",
         "scheduler:UpdateSchedule",
         "scheduler:DeleteSchedule"
-      \],
-      "Resource": "arn:aws:scheduler:\*:\*:schedule/default/dynamodb\_ttl\_\*"
+      ],
+      "Resource": "arn:aws:scheduler:*:*:schedule/default/dynamodb_ttl_*"
     },
     {
       "Sid": "PassRoleToScheduler",
       "Effect": "Allow",
       "Action": "iam:PassRole",
-      "Resource": "\*",
+      "Resource": "*",
       "Condition": {
         "StringEquals": {
           "iam:PassedToService": "scheduler.amazonaws.com"
         }
       }
     }
-  \]
-} |
-| :---- |
+  ]
+}
+```
 
 ![][image6]
 
-12. Chọn **Next**.
+1.  Chọn **Next**.
 
-13. Nhập **Policy name**, ví dụ: AWSLambdaToEventBridgeScheduler.
+2.  Nhập **Policy name**, ví dụ: AWSLambdaToEventBridgeScheduler.
 
-14. Chọn **Create policy**.
+3.  Chọn **Create policy**.
 
 ![][image7]
 
@@ -260,25 +261,23 @@ Lambda function có trách nhiệm cấu hình EventBridge Scheduler để thự
 21. Tại tab **Code** của Lambda function, thêm mã code phù hợp.  
     **Code Mẫu Lambda Function (Python)**
 
-| import json
+```
+import json
 import datetime
 import boto3
 import os
 import logging
 
-\# Configure logging
-logger \= logging.getLogger()
+logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-\# Get configuration from environment variables
-ROLE\_ARN \= os.environ.get('SCHEDULER\_ROLE\_ARN')
-TABLE\_NAME \= os.environ.get('DYNAMODB\_TABLE\_NAME')
-TIMEZONE \= os.environ.get('TIMEZONE', 'UTC')
+ROLE_ARN = os.environ.get('SCHEDULER_ROLE_ARN')
+TABLE_NAME = os.environ.get('DYNAMODB_TABLE_NAME')
+TIMEZONE = os.environ.get('TIMEZONE', 'UTC')
 
-\# Initialize AWS clients
-scheduler\_client \= boto3.client('scheduler')
+scheduler_client = boto3.client('scheduler')
 
-def lambda\_handler(event, context):
+def lambda_handler(event, context):
     try:
         if not event.get('Records'):
             logger.error("No records found in the event")
@@ -287,9 +286,8 @@ def lambda\_handler(event, context):
                 'body': json.dumps('No records found in the event')
             }
         
-        \# Process all records in the event
-        for record in event\['Records'\]:
-            process\_record(record)
+        for record in event['Records']:
+            process_record(record)
             
         return {
             'statusCode': 200,
@@ -302,87 +300,87 @@ def lambda\_handler(event, context):
             'body': json.dumps(f'Error: {str(e)}')
         }
 
-def process\_record(record):
+def process_record(record):
     try:
-        event\_name \= record.get('eventName')
+        event_name = record.get('eventName')
         
-        if event\_name \== "INSERT":
-            handle\_insert(record)
-        elif event\_name \== "MODIFY":
-            handle\_modify(record)
-        elif event\_name \== "REMOVE":
-            handle\_remove(record)
+        if event_name == "INSERT":
+            handle_insert(record)
+        elif event_name == "MODIFY":
+            handle_modify(record)
+        elif event_name == "REMOVE":
+            handle_remove(record)
         else:
-            logger.warning(f"Unhandled event type: {event\_name}")
+            logger.warning(f"Unhandled event type: {event_name}")
     except Exception as e:
         logger.warning(f"Error processing record: {str(e)}")
         raise
 
-def handle\_insert(record):
-    keys \= record\['dynamodb'\]\['Keys'\]
-    pk \= keys\['PK'\]\['S'\]
-    sk \= keys\['SK'\]\['S'\]
-    ttl\_value \= record\['dynamodb'\]\['NewImage'\]\['ttl'\]\['N'\]
+def handle_insert(record):
+    keys = record['dynamodb']['Keys']
+    pk = keys['PK']['S']
+    sk = keys['SK']['S']
+    ttl_value = record['dynamodb']['NewImage']['ttl']['N']
     
-    epoch\_dt \= datetime.datetime.fromtimestamp(int(ttl\_value))
-    logger.info(f"Creating schedule for item {pk}\#{sk} with TTL at {epoch\_dt}")
+    epoch_dt = datetime.datetime.fromtimestamp(int(ttl_value))
+    logger.info(f"Creating schedule for item {pk}#{sk} with TTL at {epoch_dt}")
     
-    scheduler\_client.create\_schedule(
+    scheduler_client.create_schedule(
         ActionAfterCompletion="DELETE",
         FlexibleTimeWindow={"Mode": "OFF"},
-        Name=f"dynamodb\_ttl\_{pk}\_{sk}",
-        ScheduleExpression=f"at({epoch\_dt.strftime('%Y-%m-%dT%H:%M:%S')})",
+        Name=f"dynamodb_ttl_{pk}_{sk}",
+        ScheduleExpression=f"at({epoch_dt.strftime('%Y-%m-%dT%H:%M:%S')})",
         ScheduleExpressionTimezone=TIMEZONE,
         Target={
-            "RoleArn": ROLE\_ARN,
+            "RoleArn": ROLE_ARN,
             "Arn": "arn:aws:scheduler:::aws-sdk:dynamodb:deleteItem",
-            "Input": json.dumps({"Key": {"PK": {"S": pk}, "SK": {"S": sk}}, "TableName": TABLE\_NAME})
+            "Input": json.dumps({"Key": {"PK": {"S": pk}, "SK": {"S": sk}}, "TableName": TABLE_NAME})
         }
     )
 
-def handle\_modify(record):
-    if 'OldImage' not in record\['dynamodb'\] or 'NewImage' not in record\['dynamodb'\]:
+def handle_modify(record):
+    if 'OldImage' not in record['dynamodb'] or 'NewImage' not in record['dynamodb']:
         return
         
-    if 'ttl' not in record\['dynamodb'\]\['OldImage'\] or 'ttl' not in record\['dynamodb'\]\['NewImage'\]:
+    if 'ttl' not in record['dynamodb']['OldImage'] or 'ttl' not in record['dynamodb']['NewImage']:
         return
         
-    keys \= record\['dynamodb'\]\['Keys'\]
-    pk \= keys\['PK'\]\['S'\]
-    sk \= keys\['SK'\]\['S'\]
-    old\_ttl \= record\['dynamodb'\]\['OldImage'\]\['ttl'\]\['N'\]
-    new\_ttl \= record\['dynamodb'\]\['NewImage'\]\['ttl'\]\['N'\]
+    keys = record['dynamodb']['Keys']
+    pk = keys['PK']['S']
+    sk = keys['SK']['S']
+    old_ttl = record['dynamodb']['OldImage']['ttl']['N']
+    new_ttl = record['dynamodb']['NewImage']['ttl']['N']
     
-    if old\_ttl \!= new\_ttl:
-        epoch\_dt \= datetime.datetime.fromtimestamp(int(new\_ttl))
-        logger.info(f"Updating schedule for item {pk}\#{sk} with new TTL at {epoch\_dt}")
+    if old_ttl != new_ttl:
+        epoch_dt = datetime.datetime.fromtimestamp(int(new_ttl))
+        logger.info(f"Updating schedule for item {pk}#{sk} with new TTL at {epoch_dt}")
         
         try:
-            scheduler\_client.update\_schedule(
-                Name=f"dynamodb\_ttl\_{pk}\_{sk}",
+            scheduler_client.update_schedule(
+                Name=f"dynamodb_ttl_{pk}_{sk}",
                 FlexibleTimeWindow={"Mode": "OFF"},
-                ScheduleExpression=f"at({epoch\_dt.strftime('%Y-%m-%dT%H:%M:%S')})",
+                ScheduleExpression=f"at({epoch_dt.strftime('%Y-%m-%dT%H:%M:%S')})",
                 ScheduleExpressionTimezone=TIMEZONE,
                 Target={
-                    "RoleArn": ROLE\_ARN,
+                    "RoleArn": ROLE_ARN,
                     "Arn": "arn:aws:scheduler:::aws-sdk:dynamodb:deleteItem",
-                    "Input": json.dumps({"Key": {"PK": {"S": pk}, "SK": {"S": sk}}, "TableName": TABLE\_NAME})
+                    "Input": json.dumps({"Key": {"PK": {"S": pk}, "SK": {"S": sk}}, "TableName": TABLE_NAME})
                 }
             )
-        except scheduler\_client.exceptions.ResourceNotFoundException:
-            handle\_insert(record)
+        except scheduler_client.exceptions.ResourceNotFoundException:
+            handle_insert(record)
 
-def handle\_remove(record):
-    keys \= record\['dynamodb'\]\['Keys'\]
-    pk \= keys\['PK'\]\['S'\]
-    sk \= keys\['SK'\]\['S'\]
-    logger.info(f"Deleting schedule for item {pk}\#{sk}")
+def handle_remove(record):
+    keys = record['dynamodb']['Keys']
+    pk = keys['PK']['S']
+    sk = keys['SK']['S']
+    logger.info(f"Deleting schedule for item {pk}#{sk}")
     
     try:
-        scheduler\_client.delete\_schedule(Name=f'dynamodb\_ttl\_{pk}\_{sk}')
-    except scheduler\_client.exceptions.ResourceNotFoundException:
-        pass |
-| :---- |
+        scheduler_client.delete_schedule(Name=f'dynamodb_ttl_{pk}_{sk}')
+    except scheduler_client.exceptions.ResourceNotFoundException:
+        pass
+```
 
 22. Chọn **Deploy** để cập nhật mã function mới nhất.
 
@@ -410,14 +408,16 @@ def handle\_remove(record):
 
 Bạn có thể kiểm tra giải pháp bằng cách thêm các items﻿ vào bảng DynamoDB của bạn với giá trị TTL. Dưới đây là ví dụ tạo 10 items﻿ mẫu với giá trị TTL sử dụng AWS CLI:
 
-| \#\!/bin/bash
+```
+#!/bin/bash
 TABLE="TTL-Table"
-for PK\_VALUE in {1..10}; do
-    ISO\_TIMESTAMP\_PLUS\_3\_MINS=$(date \-v+3M \-u \+"%Y-%m-%dT%H:%M:%S")
-    aws dynamodb put-item \--table-name $TABLE \\
-        \--item '{"PK": {"S": "'$PK\_VALUE'"}, "SK": {"S": "StaticSK"}, "REMINDER\_TIMESTAMP": {"S": "'$ISO\_TIMESTAMP\_PLUS\_3\_MINS'"}, "email": {"S": "abc@example.com"}, "ATTR\_1": {"S": "This is a static attribute"}}'
-done |
-| :---- |
+for PK_VALUE in {1..10}; do
+    ISO_TIMESTAMP_PLUS_3_MINS=$(date -v+3M -u +"%Y-%m-%dT%H:%M:%S")
+    
+    aws dynamodb put-item --table-name $TABLE \
+        --item '{"PK": {"S": "'$PK_VALUE'"}, "SK": {"S": "StaticSK"}, "REMINDER_TIMESTAMP": {"S": "'$ISO_TIMESTAMP_PLUS_3_MINS'"}, "email": {"S": "abc@example.com"}, "ATTR_1": {"S": "This is a static attribute"}}'
+done
+```
 
 ## Bạn có thể điều hướng đến tab **Monitoring** của nhóm lịch trình EventBridge để xem các lệnh xóa đang được thực thi. Schedule sẽ kích hoạt các thao tác vào một thời điểm cụ thể; bạn có thể quan sát các lần kích hoạt này bằng cách xem chỉ số InvocationAttemptCount. Trong trường hợp của chúng tôi, các lần kích hoạt là các lệnh xóa được thực hiện đối với bảng DynamoDB. Để xem danh sách tất cả các chỉ số có sẵn cho một nhóm lịch trình, hãy tham khảo [Monitoring Amazon EventBridge Scheduler with Amazon CloudWatch﻿](https://docs.aws.amazon.com/scheduler/latest/UserGuide/monitoring-cloudwatch.html).
 
@@ -471,31 +471,25 @@ Trong [Phần 2](https://aws.amazon.com/blogs/database/implement-event-driven-ar
 
 **Về các tác giả**
 
-| Lee Hannigan [Lee](https://www.linkedin.com/in/lee-hannigan/) Hannigan là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Donegal, Ireland. Anh có chuyên môn sâu rộng về các hệ thống phân tán (distributed systems), cùng nền tảng vững chắc về các công nghệ dữ liệu lớn (big data) và phân tích (analytics technologies). Trong vai trò Chuyên gia giải pháp DynamoDB, Lee xuất sắc trong việc hỗ trợ khách hàng thiết kế, đánh giá và tối ưu hóa khối lượng công việc (workloads) sử dụng các khả năng của DynamoDB. |
+| ![][image11] Lee Hannigan [Lee](https://www.linkedin.com/in/lee-hannigan/) Hannigan là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Donegal, Ireland. Anh có chuyên môn sâu rộng về các hệ thống phân tán (distributed systems), cùng nền tảng vững chắc về các công nghệ dữ liệu lớn (big data) và phân tích (analytics technologies). Trong vai trò Chuyên gia giải pháp DynamoDB, Lee xuất sắc trong việc hỗ trợ khách hàng thiết kế, đánh giá và tối ưu hóa khối lượng công việc (workloads) sử dụng các khả năng của DynamoDB. |
 | :---- |
 
-| Aman Dhingra [Aman](https://www.linkedin.com/in/amdhing/) Dhingra là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Dublin, Ireland. Anh có đam mê về các hệ thống phân tán (distributed systems) và nền tảng chuyên sâu về dữ liệu lớn & phân tích (big data & analytics). Aman là tác giả của cuốn "Amazon DynamoDB – The Definitive Guide" và hỗ trợ khách hàng trong việc thiết kế, đánh giá và tối ưu hóa khối lượng công việc vận hành trên Amazon DynamoDB. |
+| ![][image12] Aman Dhingra [Aman](https://www.linkedin.com/in/amdhing/) Dhingra là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Dublin, Ireland. Anh có đam mê về các hệ thống phân tán (distributed systems) và nền tảng chuyên sâu về dữ liệu lớn & phân tích (big data & analytics). Aman là tác giả của cuốn "Amazon DynamoDB – The Definitive Guide" và hỗ trợ khách hàng trong việc thiết kế, đánh giá và tối ưu hóa khối lượng công việc vận hành trên Amazon DynamoDB. |
 | :---- |
 
-| Jack Le Bon [Jack](https://www.linkedin.com/in/jack-le-bon/) Le Bon là Kiến trúc sư giải pháp (Solutions Architect) làm việc tại London, chuyên hỗ trợ các khách hàng thuộc lĩnh vực truyền thông và giải trí (Media & Entertainment). Là thành viên của nhóm chuyên về công nghệ không máy chủ (Serverless speciality group) tại AWS, Jack giúp khách hàng thiết kế và triển khai kiến trúc hướng sự kiện (event-driven architectures) sử dụng các công nghệ Serverless. Jack tập trung vào hỗ trợ các tổ chức xây dựng kiến trúc hiệu quả, giúp họ tập trung vào hoạt động kinh doanh cốt lõi thay vì quản lý hạ tầng. |
+| ![][image13] Jack Le Bon [Jack](https://www.linkedin.com/in/jack-le-bon/) Le Bon là Kiến trúc sư giải pháp (Solutions Architect) làm việc tại London, chuyên hỗ trợ các khách hàng thuộc lĩnh vực truyền thông và giải trí (Media & Entertainment). Là thành viên của nhóm chuyên về công nghệ không máy chủ (Serverless speciality group) tại AWS, Jack giúp khách hàng thiết kế và triển khai kiến trúc hướng sự kiện (event-driven architectures) sử dụng các công nghệ Serverless. Jack tập trung vào hỗ trợ các tổ chức xây dựng kiến trúc hiệu quả, giúp họ tập trung vào hoạt động kinh doanh cốt lõi thay vì quản lý hạ tầng. |
 | :---- |
 
-[image1]:
-
-[image2]:
-
-[image3]:
-
-[image4]:
-
-[image5]:
-
-[image6]:
-
-[image7]:
-
-[image8]:
-
-[image9]:
-
-[image10]:
+[image1]: /images/3-Blog/Blog-1/image_1.png
+[image2]: /images/3-Blog/Blog-1/image_2.png
+[image3]: /images/3-Blog/Blog-1/image_3.png
+[image4]: /images/3-Blog/Blog-1/image_4.png
+[image5]: /images/3-Blog/Blog-1/image_5.png
+[image6]: /images/3-Blog/Blog-1/image_6.png
+[image7]: /images/3-Blog/Blog-1/image_7.png
+[image8]: /images/3-Blog/Blog-1/image_8.png
+[image9]: /images/3-Blog/Blog-1/image_9.png
+[image10]: /images/3-Blog/Blog-1/image_10.png
+[image11]: /images/3-Blog/Blog-1/image_11.png
+[image12]: /images/3-Blog/Blog-1/image_12.png
+[image13]: /images/3-Blog/Blog-1/image_13.png

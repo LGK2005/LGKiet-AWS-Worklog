@@ -22,7 +22,7 @@ Chúng tôi đang tạo ra một nền tảng tự động phát hiện các ph�
 Tần suất và sự tinh vi ngày càng tăng của các mối đe dọa mạng đặt ra những rủi ro đáng kể cho các tổ chức dựa vào cơ sở hạ tầng đám mây. Quy trình ứng phó sự cố thủ công thường chậm chạp, không nhất quán và dễ mắc lỗi của con người, có thể dẫn đến thời gian ngừng hoạt động hệ thống kéo dài, vi phạm dữ liệu và tổn thất tài chính. Dự án nhằm giải quyết những thách thức này bằng cách phát triển một hệ thống ứng phó sự cố tự động, đáng tin cậy và có khả năng mở rộng.
 
 ### Giải pháp
-Các trường hợp sử dụng chính bao gồm phát hiện việc sử dụng trái phép thông tin xác thực AWS, xác định các EC2 instance bị xâm nhập, và đảm bảo dữ liệu pháp y được thu thập, xử lý và lưu trữ đúng cách để điều tra. Kiến trúc của chúng tôi tích hợp VPC Flow Logs, CloudTrail, và GuardDuty để phát hiện các mối đe dọa, trong khi Step Functions điều phối quy trình ứng phó tự động bao gồm cô lập EC2, tách khỏi ASG, và cách ly IAM. Tất cả bằng chứng được thu thập và xử lý thông qua Lambda ETL tùy chỉnh và Data Firehose, sử dụng Athena để phân tích pháp y.
+Các trường hợp sử dụng chính bao gồm phát hiện việc sử dụng trái phép thông tin xác thực AWS, xác định các EC2 instance bị xâm nhập, và đảm bảo dữ liệu pháp y được thu thập, xử lý và lưu trữ đúng cách để điều tra. Kiến trúc của chúng tôi tích hợp VPC Flow Logs, CloudTrail, CloudWatch và GuardDuty để phát hiện các mối đe dọa, trong khi Step Functions điều phối quy trình ứng phó tự động bao gồm cô lập EC2, tách khỏi ASG, tạo Snapshot và cách ly IAM. Tất cả bằng chứng được thu thập và xử lý thông qua Lambda ETL tùy chỉnh và Data Firehose, sử dụng Athena để phân tích pháp y. Hệ thống cũng bao gồm alert dispatching, notification bằng email và Slack, và cho chúng ta cái dashboard để analyze và điều tra chuyện đã xảy ra.
 
 ### Lợi ích và Tỷ suất Lợi nhuận (ROI)
 * **Phát hiện mối đe dọa nhanh chóng**: Phản ứng tự động giúp giảm thiểu khoảng thời gian dễ bị tổn thương.
@@ -48,10 +48,15 @@ Giải pháp của chúng tôi sử dụng một kiến trúc đa giai đoạn t
 - **Amazon Cognito**: Bảo mật quyền truy cập cho người dùng bảng điều khiển.
 - **Amazon CloudFront**: Tăng tốc độ phân phối bảng điều khiển trên toàn cầu.
 - **Amazon SNS & SES**: Xử lý thông báo qua tin nhắn và email.
+- **AWS CloudTrail**: Ghi nhật ký tất cả các hành động để kiểm toán.
+- **Amazon CloudWatch**: Giám sát và bảng điều khiển.
+- **Amazon EC2**: Các instance tùy chọn để phân tích.
+- **AWS KMS**: Quản lý khóa để mã hóa.
+- **Amazon Kinesis Data Firehose**: Truyền dữ liệu đến S3.
 
 ### Thiết kế Thành phần
-- **Lớp Thu thập Dữ liệu & Phát hiện**: Thu thập các sự kiện từ VPC Flow Logs, CloudTrail, EC2 và GuardDuty.
-- **Lớp Xử lý Sự kiện**: EventBridge định tuyến các phát hiện đến Step Functions; các sự kiện được phân loại theo loại.
+- **Lớp Thu thập Dữ liệu & Phát hiện**: Thu thập các sự kiện từ VPC Flow Logs, CloudTrail, CloudWatch, EC2 và GuardDuty.
+- **Lớp Xử lý Sự kiện**: Alert Dispatch, EventBridge định tuyến các phát hiện đến Step Functions; các sự kiện được phân loại theo loại.
 - **Điều phối Ứng phó Tự động (Orchestration)**: Step Functions xử lý phân tích, ra quyết định, cô lập EC2, bảo vệ chấm dứt, tách ASG, tạo snapshot và cách ly IAM.
 - **Lớp Xử lý Dữ liệu & Phân tích**: ETL pipeline với Lambda và Data Firehose xử lý nhật ký thô vào S3; Athena truy vấn dữ liệu.
 - **Lớp Bảng điều khiển & Phân tích**: Bảng điều khiển React lưu trữ trên S3 với xác thực Cognito, sử dụng dữ liệu qua API Gateway và Athena.
@@ -75,12 +80,25 @@ Chúng tôi sử dụng Agile Scrum với các sprint 1 tuần trong vòng 6 tu�
 
 ## 5. Thời gian biểu & Cột mốc
 **Dòng thời gian Dự án**
-- **Tuần 6-7 (Nền tảng & Thiết lập)**: Thiết lập dự án CDK, xem xét kiến trúc, đào tạo nhóm.
-- **Tuần 7-9 (Điều phối Cốt lõi)**: Quy trình Step Functions, các Lambda ứng phó, kiểm thử tích hợp.
-- **Tuần 10 (Dữ liệu & Phân tích)**: Firehose, lưu trữ S3, bảng Athena, đường ống ETL.
-- **Tuần 11 (Bảng điều khiển & UI)**: Bảng điều khiển tĩnh, Cognito, API Gateway, CloudFront.
-- **Tuần 12 (Kiểm thử & Xác thực)**: Kiểm thử thủ công, quét bảo mật, mô phỏng tấn công.
-- **Tuần 13 (Tài liệu & Bàn giao)**: Hướng dẫn triển khai, demo cuối cùng, kho lưu trữ công khai.
+**Dòng thời gian Dự án**
+- **Tuần 6-7 (Nền tảng & Thiết lập)**
+    - **Hoạt động**: Đào tạo nhóm về GuardDuty/Step Functions, đánh giá thiết kế kiến trúc, thiết lập VPC và bảo mật.
+    - **Sản phẩm bàn giao**: Tài liệu kiến trúc v1, hoàn thành đào tạo nhóm, kho lưu trữ GitHub được thiết lập.
+- **Tuần 7-9 (Điều phối Cốt lõi)**
+    - **Hoạt động**: Phát triển quy trình Step Functions, lập trình hàm Lambda cho tất cả các hành động ứng phó, tích hợp EventBridge, thiết lập SNS/SES, kiểm thử tích hợp.
+    - **Sản phẩm bàn giao**: Định nghĩa máy trạng thái Step Functions, hơn 7 hàm Lambda có tài liệu, tích hợp GuardDuty, hệ thống thông báo, API Gateway.
+- **Tuần 10 (Dữ liệu & Phân tích)**
+    - **Hoạt động**: Thiết lập lưu trữ pháp y S3, tạo bảng Athena, phát triển đường ống ETL, thư viện truy vấn SQL.
+    - **Sản phẩm bàn giao**: Hơn 15 truy vấn Athena được ghi lại, sách hướng dẫn phân tích pháp y, lưu trữ dữ liệu đã xử lý.
+- **Tuần 11 (Bảng điều khiển & UI)**
+    - **Hoạt động**: Phát triển bảng điều khiển tĩnh, xác thực Cognito, thiết lập API Gateway, cấu hình CloudFront CDN, tích hợp bảng điều khiển.
+    - **Sản phẩm bàn giao**: Bảng điều khiển lưu trữ trên S3, hệ thống xác thực, giao diện truy vấn, tích hợp kết quả thời gian thực.
+- **Tuần 12 (Kiểm thử, Xác thực & Tối ưu hóa)**
+    - **Hoạt động**: Kiểm thử thủ công, quét bảo mật bao gồm các kịch bản sự cố mô phỏng (hơn 5 quy trình), kiểm thử hiệu suất, mô phỏng tấn công. Tối ưu hóa dữ liệu với truy vấn Athena và Data Firehose.
+    - **Sản phẩm bàn giao**: Kết quả quét bảo mật, video mô phỏng sự cố, tối ưu hóa dữ liệu.
+- **Tuần 13 (Tài liệu & Bàn giao)**
+    - **Hoạt động**: Hướng dẫn triển khai, tài liệu API, các phiên chuyển giao kiến thức, demo cuối cùng, dọn dẹp GitHub.
+    - **Sản phẩm bàn giao**: Kho lưu trữ GitHub hoàn chỉnh (công khai), hướng dẫn triển khai, buổi trình diễn workshop trực tiếp.
 
 ## 6. Ước tính Ngân sách
 Bạn có thể tìm thấy ước tính ngân sách chi tiết trên [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=b9b2c0423dcd3b21dadd62e5053a5fdf2d003339).
@@ -93,7 +111,10 @@ Chi phí triển khai hàng tháng điển hình (Bậc miễn phí / Quy mô nh
 - **KMS**: ~$1.12/tháng
 - **CloudTrail**: ~$0.55/tháng
 - **Athena**: ~$0.29/tháng
-- **Lambda, Step Functions, SNS, DynamoDB**: Thường nằm trong giới hạn Bậc miễn phí cho mức sử dụng thông thường.
+- **Amazon Simple Email Service (SES)**: ~$0.09/tháng
+- **Amazon API Gateway**: ~$0.05/tháng
+- **Amazon Data firehose**: ~$0.04/tháng
+- **Lambda, Step Functions, SNS**: Thường nằm trong giới hạn Bậc miễn phí cho mức sử dụng thông thường.
 
 **Lưu ý**: Chi phí giả định mức sử dụng thông thường từ 20-150 sự cố mỗi tháng.
 

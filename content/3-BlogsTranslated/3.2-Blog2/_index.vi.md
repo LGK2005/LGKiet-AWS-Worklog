@@ -136,31 +136,32 @@ Tiếp theo, chúng tôi cấu hình Lambda function sẽ được gọi bởi E
 
 6. [Thêm policy](https://docs.aws.amazon.com/lambda/latest/dg/lambda-permissions.html) cho phép hàm đọc từ GSI và ghi vào bảng﻿:
 
-| {
+```
+{
     "Version": "2012-10-17",
-    "Statement": \[
+    "Statement": [
         {
             "Sid": "ReadFromGSI",
             "Effect": "Allow",
-            "Action": \[
+            "Action": [
                 "dynamodb:Query"
-            \],
-            "Resource": \[
-                "arn:aws:dynamodb:\<region\>:\<account-id\>:table/\<table-name\>",
-                "arn:aws:dynamodb:\<region\>:\<account-id\>:table/\<table-name\>/index/\<gsi-name\>"
-            \]
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:<region>:<account-id>:table/<table-name>",
+                "arn:aws:dynamodb:<region>:<account-id>:table/<table-name>/index/<gsi-name>"
+            ]
         },
         {
             "Sid": "WriteToTable",
             "Effect": "Allow",
-            "Action": \[
+            "Action": [
                 "dynamodb:DeleteItem"
-            \],
-            "Resource": "arn:aws:dynamodb:\<region\>:\<account-id\>:table/\<table-name\>"
+            ],
+            "Resource": "arn:aws:dynamodb:<region>:<account-id>:table/<table-name>"
         }
-    \]
-} |
-| :---- |
+    ]
+}
+```
 
 7. Chọn﻿ **Create function**.
 
@@ -168,77 +169,69 @@ Tiếp theo, chúng tôi cấu hình Lambda function sẽ được gọi bởi E
 
 8. Trên tab﻿ **Code** của Lambda function, thay thế mã Lambda function bằng mã sau. Thay đổi các hằng số﻿, SHARDS, TABLE\_NAME, và﻿ INDEX\_NAME để phù hợp với yêu cầu cụ thể của bạn﻿:
 
-| import boto3
+```
+import boto3
 from datetime import datetime
 
-\# Constants
-SHARDS \= 4
-TABLE\_NAME \= 'TTL-Table'
-INDEX\_NAME \= 'TTL-index'
+# Constants
+SHARDS = 4
+TABLE_NAME = 'TTL-Table'
+INDEX_NAME = 'TTL-index'
 
-dynamodb \= boto3.resource('dynamodb')
-table \= dynamodb.Table(TABLE\_NAME)
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table(TABLE_NAME)
 
-def lambda\_handler(event, context):
-    current\_time \= datetime.now().replace(second=0, microsecond=0).isoformat()
+def lambda_handler(event, context):
+    current_time = datetime.now().replace(second=0, microsecond=0).isoformat()
     
     for shard in range(SHARDS):
-        shard\_key \= str(shard)
-        query\_and\_delete\_expired\_items(shard\_key, current\_time)
+        shard_key = str(shard)
+        query_and_delete_expired_items(shard_key, current_time)
 
-def query\_and\_delete\_expired\_items(shard\_key, current\_time):
-    last\_evaluated\_key \= None
+def query_and_delete_expired_items(shard_key, current_time):
+    last_evaluated_key = None
     
     while True:
-        print(shard\_key, current\_time)
+        # Print for logging purposes
+        print(f"Checking shard {shard_key} at {current_time}")
         
-        if last\_evaluated\_key:
-            response \= table.query(
-                IndexName=INDEX\_NAME,
-                KeyConditionExpression='GSI\_PK \= :shard AND \#ttl \< :current\_time',
-                ExpressionAttributeValues={
-                    ':shard': shard\_key,
-                    ':current\_time': current\_time
-                },
-                ExpressionAttributeNames={
-                    '\#ttl': 'TTL'
-                },
-                ExclusiveStartKey=last\_evaluated\_key
-            )
-        else:
-            response \= table.query(
-                IndexName=INDEX\_NAME,
-                KeyConditionExpression='GSI\_PK \= :shard AND \#ttl \< :current\_time',
-                ExpressionAttributeValues={
-                    ':shard': shard\_key,
-                    ':current\_time': current\_time
-                },
-                ExpressionAttributeNames={
-                    '\#ttl': 'TTL'
-                }
-            )
+        query_kwargs = {
+            'IndexName': INDEX_NAME,
+            'KeyConditionExpression': 'GSI_PK = :shard AND #ttl < :current_time',
+            'ExpressionAttributeValues': {
+                ':shard': shard_key,
+                ':current_time': current_time
+            },
+            'ExpressionAttributeNames': {
+                '#ttl': 'TTL'
+            }
+        }
         
-        items\_to\_delete \= response.get('Items', \[\])
+        if last_evaluated_key:
+            query_kwargs['ExclusiveStartKey'] = last_evaluated_key
+            
+        response = table.query(**query_kwargs)
         
-        if items\_to\_delete:
-            delete\_expired\_items(items\_to\_delete)
+        items_to_delete = response.get('Items', [])
         
-        last\_evaluated\_key \= response.get('LastEvaluatedKey')
+        if items_to_delete:
+            delete_expired_items(items_to_delete)
         
-        if not last\_evaluated\_key:
+        last_evaluated_key = response.get('LastEvaluatedKey')
+        
+        if not last_evaluated_key:
             break
 
-def delete\_expired\_items(items):
-    with table.batch\_writer() as batch:
+def delete_expired_items(items):
+    with table.batch_writer() as batch:
         for item in items:
-            batch.delete\_item(
+            batch.delete_item(
                 Key={
-                    'PK': item\['PK'\],
-                    'SK': item\['SK'\]
+                    'PK': item['PK'],
+                    'SK': item['SK']
                 }
-            ) |
-| :---- |
-
+            )
+```
 9. Chọn﻿ **Deploy** để triển khai mã hàm mới nhất﻿.
 
 Hàm﻿ delete\_expired\_items sử dụng﻿ [Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) [batch\_writer](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/dynamodb/table/batch_writer.html) để thực hiện xóa hàng loạt cho hiệu quả. Tuy nhiên﻿, batch\_writer không hỗ trợ﻿ [ConditionExpression](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html), có nghĩa là không có cách nào để kiểm tra xem một mục vẫn đủ điều kiện để xóa tại thời điểm ghi. Điều này có thể rủi ro trong các trường hợp sử dụng mà giá trị TTL có thể đã thay đổi giữa lần đọc ban đầu và nỗ lực xóa. Để tránh vô tình xóa các mục không còn hết hạn, được khuyến nghị sử dụng hoạt động DeleteItem với﻿ ConditionExpression xác minh giá trị TTL vẫn trong phạm vi mong đợi﻿.
@@ -287,18 +280,23 @@ Bây giờ chúng tôi tạo lịch trình EventBridge gọi Lambda function m�
 
 Bạn có thể kiểm tra giải pháp bằng cách thêm mục vào bảng DynamoDB với giá trị TTL. Đây là ví dụ tạo 10 mục mẫu với giá trị TTL bằng AWS CLI﻿:
 
-| \#\!/bin/bash
+```
+#!/bin/bash
 
 TABLE="TTL-Table"
 
-for PK\_VALUE in {1..10}; do
-    ISO\_TIMESTAMP=$(date \-u \+"%Y-%m-%dT%H:%M:%SZ")
-    GSI\_PK\_VALUE=$((RANDOM % 4))  \# Generate a random shard value between 0 and 3
+for PK_VALUE in {1..10}; do
+    # Get current UTC time in ISO 8601 format
+    ISO_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     
-    aws dynamodb put-item \--table-name $TABLE \\
-    \--item '{"PK": {"S": "'$PK\_VALUE'"}, "SK": {"S": "StaticSK"}, "GSI\_PK": {"S": "'$GSI\_PK\_VALUE'"}, "TTL": {"S": "'$ISO\_TIMESTAMP'"}, "SessionData": {"S": "{\\"cart\\": \\"item'${PK\_VALUE}'\\"}"}}' 
-done |
-| :---- |
+    # Generate a random shard value between 0 and 3
+    GSI_PK_VALUE=$((RANDOM % 4))  
+    
+    # Put item into DynamoDB
+    aws dynamodb put-item --table-name $TABLE \
+    --item '{"PK": {"S": "'$PK_VALUE'"}, "SK": {"S": "StaticSK"}, "GSI_PK": {"S": "'$GSI_PK_VALUE'"}, "TTL": {"S": "'$ISO_TIMESTAMP'"}, "SessionData": {"S": "{\"cart\": \"item'$PK_VALUE'\"}"}}' 
+done
+```
 
 Để theo dõi các hoạt động xóa trên bảng DynamoDB của bạn, điều hướng đến tab﻿ **Monitoring** trên console DynamoDB. Trong thiết lập này, lịch trình EventBridge gọi Lambda function mỗi 5 phút để lấy và xóa mục bằng lệnh﻿ BatchWriteItem. Bạn có thể theo dõi các hoạt động xóa bằng cách xem metric﻿ SuccessfulRequestLatency cho hoạt động﻿ BatchWriteItem, sử dụng thống kê﻿ **Sample Count** để xem số lần gọi xóa. Để biết thêm chi tiết về metrics DynamoDB, tham khảo﻿ [DynamoDB Metrics and dimensions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html).
 
@@ -342,32 +340,23 @@ Trong﻿ [Phần 3﻿](https://aws.amazon.com/blogs/database/implement-event-dri
 
 ## **Về các tác giả﻿**
 
-| Lee Hannigan [Lee](https://www.linkedin.com/in/lee-hannigan/) Hannigan là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Donegal, Ireland. Anh có chuyên môn sâu rộng về các hệ thống phân tán (distributed systems), cùng nền tảng vững chắc về các công nghệ dữ liệu lớn (big data) và phân tích (analytics technologies). Trong vai trò Chuyên gia giải pháp DynamoDB, Lee xuất sắc trong việc hỗ trợ khách hàng thiết kế, đánh giá và tối ưu hóa khối lượng công việc (workloads) sử dụng các khả năng của DynamoDB. |
+| ![][image13] Lee Hannigan [Lee](https://www.linkedin.com/in/lee-hannigan/) Hannigan là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Donegal, Ireland. Anh có chuyên môn sâu rộng về các hệ thống phân tán (distributed systems), cùng nền tảng vững chắc về các công nghệ dữ liệu lớn (big data) và phân tích (analytics technologies). Trong vai trò Chuyên gia giải pháp DynamoDB, Lee xuất sắc trong việc hỗ trợ khách hàng thiết kế, đánh giá và tối ưu hóa khối lượng công việc (workloads) sử dụng các khả năng của DynamoDB. |
 | :---- |
 
-| Aman Dhingra [Aman](https://www.linkedin.com/in/amdhing/) Dhingra là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Dublin, Ireland. Anh có đam mê về các hệ thống phân tán (distributed systems) và nền tảng chuyên sâu về dữ liệu lớn & phân tích (big data & analytics). Aman là tác giả của cuốn "Amazon DynamoDB – The Definitive Guide" và hỗ trợ khách hàng trong việc thiết kế, đánh giá và tối ưu hóa khối lượng công việc vận hành trên Amazon DynamoDB. |
+| ![][image14] Aman Dhingra [Aman](https://www.linkedin.com/in/amdhing/) Dhingra là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Dublin, Ireland. Anh có đam mê về các hệ thống phân tán (distributed systems) và nền tảng chuyên sâu về dữ liệu lớn & phân tích (big data & analytics). Aman là tác giả của cuốn "Amazon DynamoDB – The Definitive Guide" và hỗ trợ khách hàng trong việc thiết kế, đánh giá và tối ưu hóa khối lượng công việc vận hành trên Amazon DynamoDB. |
 | :---- |
 
-[image1]:
-
-[image2]:
-
-[image3]:
-
-[image4]:
-
-[image5]:
-
-[image6]:
-
-[image7]: 
-
-[image8]:
-
-[image9]:
-
-[image10]:
-
-[image11]:
-
-[image12]:
+[image1]: /images/3-Blog/Blog-2/image_1.png
+[image2]: /images/3-Blog/Blog-2/image_2.png
+[image3]: /images/3-Blog/Blog-2/image_3.png
+[image4]: /images/3-Blog/Blog-2/image_4.png
+[image5]: /images/3-Blog/Blog-2/image_5.png
+[image6]: /images/3-Blog/Blog-2/image_6.png
+[image7]: /images/3-Blog/Blog-2/image_7.png
+[image8]: /images/3-Blog/Blog-2/image_8.png
+[image9]: /images/3-Blog/Blog-2/image_9.png
+[image10]: /images/3-Blog/Blog-2/image_10.png
+[image11]: /images/3-Blog/Blog-2/image_11.png
+[image12]: /images/3-Blog/Blog-2/image_12.png
+[image13]: /images/3-Blog/Blog-1/image_11.png
+[image14]: /images/3-Blog/Blog-1/image_12.png

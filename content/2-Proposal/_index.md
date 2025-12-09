@@ -22,7 +22,7 @@ We're creating a platform that automatically detects security findings from Guar
 The increasing frequency and sophistication of cyber threats pose significant risks to organizations relying on cloud infrastructure. Manual incident response processes are often slow, inconsistent, and prone to human error, which can lead to prolonged system downtime, data breaches, and financial losses. The project aims to address these challenges by developing an automated, reliable, and scalable incident response system that minimizes response time, enhances forensic capabilities, and reduces operational costs.
 
 ### The Solution
-The main use cases include detecting unauthorized AWS credential use, identifying compromised EC2 instances, and ensuring forensic data is properly collected, processed, and stored for investigation. Our architecture integrates VPC Flow Logs, CloudTrail, and GuardDuty to detect threats, while Step Functions orchestrates the automated response workflow including EC2 isolation, ASG detachment, and IAM quarantine. All evidence is collected and processed through custom ETL Lambda and Data Firehose, using Athena for forensic analysis.
+The main use cases include detecting unauthorized AWS credential use, identifying compromised EC2 instances, and ensuring forensic data is properly collected, processed, and stored for investigation. Our architecture integrates VPC Flow Logs, CloudTrail, CloudWatch, and GuardDuty to detect threats, while Step Functions orchestrates the automated response workflow including EC2 isolation, ASG detachment, Create Snapshot and IAM quarantine. All evidence is collected and processed through custom ETL Lambda and Data Firehose, using Athena for forensic analysis. The system also includes alert dispatching, notification via messaging and email, and provides dashboards and analytics for security teams to investigate what happened.
 
 ### Benefits and Return on Investment
 * **Rapid threat detection**: Automated response reduces the window of vulnerability.
@@ -48,11 +48,17 @@ Our solution uses a comprehensive multi-stage architecture for automated inciden
 - **Amazon Cognito**: Secures access for dashboard users.
 - **Amazon CloudFront**: Accelerates dashboard delivery across the globe.
 - **Amazon SNS & SES**: Handles notifications via messaging and email.
+- **AWS CloudTrail**: Logs all actions for auditing.
+- **Amazon CloudWatch**: Monitoring and dashboards.
+- **Amazon EC2**: Optional instances for analysis.
+- **AWS KMS**: Key management for encryption.
+- **Amazon Kinesis Data Firehose**: Streams data to S3.
 
 ### Component Design
-- **Data Collection & Detection Layer**: Collects events from VPC Flow Logs, CloudTrail, EC2, and GuardDuty.
-- **Event Processing Layer**: EventBridge routes findings to Step Functions; events are classified by type.
+- **Data Collection & Detection Layer**: Collects events from VPC Flow Logs, CloudTrail, CloudWatch, EC2, and GuardDuty.
+- **Event Processing Layer**: Alert Dispatch, EventBridge routes findings to Step Functions; events are classified by type.
 - **Automated Response Orchestration**: Step Functions handle parsing, decision making, EC2 isolation, termination protection, ASG detachment, snapshot creation, and IAM quarantine.
+**Alerting & Notification Layer**: SNS, Slack & SES handles notifications via messaging and email, Alert Dispatch.
 - **Data Processing & Analytics Layer**: ETL pipeline with Lambda and Data Firehose processes raw logs into S3; Athena queries the data.
 - **Dashboard & Analysis Layer**: S3-hosted React dashboard with Cognito auth, consuming data via API Gateway and Athena.
 
@@ -75,12 +81,25 @@ We use Agile Scrum with 1-week sprints over 6 weeks:
 
 ## 5. Timeline & Milestones
 **Project Timeline**
-- **Week 6-7 (Foundation & Setup)**: CDK project setup, architecture review, team training.
-- **Week 7-9 (Core Orchestration)**: Step Functions workflow, response Lambdas, integration testing.
-- **Week 10 (Data & Analytics)**: Firehose, S3 storage, Athena tables, ETL pipeline.
-- **Week 11 (Dashboard & UI)**: Static dashboard, Cognito, API Gateway, CloudFront.
-- **Week 12 (Testing & Validation)**: Manual testing, security scanning, attack simulations.
-- **Week 13 (Documentation & Handover)**: Deployment guides, final demo, public repository.
+**Project Timeline**
+- **Week 6-7 (Foundation & Setup)**
+    - **Activities**: Team training on GuardDuty/Step Functions, architecture design review, VPC and security setup.
+    - **Deliverables**: Architecture document v1, team training completion, GitHub repository established.
+- **Week 7-9 (Core Orchestration)**
+    - **Activities**: Step Functions workflow development, Lambda function coding for all response actions, EventBridge integration, SNS/SES setup, integration testing.
+    - **Deliverables**: Step Functions state machine definition, 7+ Lambda functions with documentation, GuardDuty integration, notification system, API Gateway.
+- **Week 10 (Data & Analytics)**
+    - **Activities**: S3 forensic storage setup, Athena table creation, ETL pipeline development, SQL query library.
+    - **Deliverables**: 15+ Athena queries documented, forensic analysis runbooks, processed data storage.
+- **Week 11 (Dashboard & UI)**
+    - **Activities**: Static dashboard development, Cognito authentication, API Gateway setup, CloudFront CDN configuration, dashboard integration.
+    - **Deliverables**: S3-hosted dashboard, authentication system, query interface, real-time results integration.
+- **Week 12 (Testing & Validation & Optimization)**
+    - **Activities**: Manual testing, security scanning including simulated incident scenarios (5+ workflows), performance testing, attack simulation. Optimize data with Athena query and Data Firehose.
+    - **Deliverables**: Security scan results, incident simulation videos, data optimization.
+- **Week 13 (Documentation & Handover)**
+    - **Activities**: Deployment guide, API documentation, knowledge transfer sessions, final demo, GitHub cleanup.
+    - **Deliverables**: Complete GitHub repository (public), deployment guide instructions, live workshop demonstration.
 
 ## 6. Budget Estimation
 You can find the detailed budget estimation on the [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=b9b2c0423dcd3b21dadd62e5053a5fdf2d003339).
@@ -93,7 +112,10 @@ Typical monthly deployment cost (Free Tier / Low scale): **~$5.01**
 - **KMS**: ~$1.12/month
 - **CloudTrail**: ~$0.55/month
 - **Athena**: ~$0.29/month
-- **Lambda, Step Functions, SNS, DynamoDB**: Generally within Free Tier limits for typical usage.
+- **Amazon Simple Email Service (SES)**: ~$0.09/month
+- **Amazon API Gateway**: ~$0.05/month
+- **Amazon Data firehose**: ~$0.04/month
+- **Lambda, Step Functions, SNS**: Generally within Free Tier limits for typical usage.
 
 
 **Note**: Costs assume typical usage of 20-150 incidents per month.
