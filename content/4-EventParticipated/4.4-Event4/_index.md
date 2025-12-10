@@ -237,6 +237,3 @@ The event wrapped up with group photos and a Kahoot quiz; placing in the ranking
 
 ![Attendee](/images/4-Event/Event5AttendeePic.jpg)  
 _Event attendee group picture_
-
-![Full Threat Blocked](/images/4-Event/FullThreatBlockedWAFWorkshop.jpg)  
-_Blocked all workshop threat scenarios during the WAF lab_

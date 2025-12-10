@@ -237,6 +237,3 @@ Sự kiện kết thúc với phần chụp ảnh kỷ niệm và quiz Kahoot; v
 
 ![Attendee](/images/4-Event/Event5AttendeePic.jpg)  
 _Hình chụp nhóm tham dự workshop_
-
-![Full Threat Blocked](/images/4-Event/FullThreatBlockedWAFWorkshop.jpg)  
-_Hoàn thành chặn toàn bộ kịch bản tấn công trong phần lab WAF_
