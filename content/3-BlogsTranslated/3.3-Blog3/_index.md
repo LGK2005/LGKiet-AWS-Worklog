@@ -1,235 +1,249 @@
 ---
 title: "Blog 3"
-date: "2000-10-04"
-weight: 03
+date: "2000-01-01"
+weight: 1
 chapter: false
 pre: " <b> 3.3. </b> "
 ---
-## [Blog AWS Cloud Operations](https://aws.amazon.com/blogs/mt/)
+# **Triển khai kiến trúc hướng sự kiện với Amazon DynamoDB – Phần 3**
 
-# Mô phỏng lỗi cục bộ với AWS Fault Injection Service
+bởi Lee Hannigan và Aman Dhingra | vào ngày 25 tháng 9 năm 2025 | trong [Advanced (300)](https://aws.amazon.com/blogs/database/category/learning-levels/advanced-300/), [Amazon DynamoDB](https://aws.amazon.com/blogs/database/category/database/amazon-dynamodb/), [Amazon EventBridge](https://aws.amazon.com/blogs/database/category/application-integration/amazon-eventbridge/), [AWS Lambda](https://aws.amazon.com/blogs/database/category/compute/aws-lambda/), [Serverless](https://aws.amazon.com/blogs/database/category/serverless/), [Technical How-to](https://aws.amazon.com/blogs/database/category/post-types/technical-how-to/)
 
-bởi Ozgur Canibeyaz và Pablo Colazurdo vào ngày 30 THÁNG 6 2025 trong [AWS Fault Injection Service (FIS)](https://aws.amazon.com/blogs/mt/category/developer-tools/aws-fault-injection-service-fis/"), [AWS Resilience Hub (ARH)](https://aws.amazon.com/blogs/mt/category/management-and-governance/aws-resilience-hub/), [AWS Systems Manager](https://aws.amazon.com/blogs/mt/category/management-tools/aws-systems-manager/), [Management Tools](https://aws.amazon.com/blogs/mt/category/management-tools/), [Resilience](https://aws.amazon.com/blogs/mt/category/resilience), [Technical How-to](https://aws.amazon.com/blogs/mt/category/post-types/technical-how-to/) |  [Permalink](https://aws.amazon.com/blogs/mt/simulating-partial-failures-with-aws-fault-injection-service/) | Chia sẻ
+Ở [Phần 1](https://aws.amazon.com/blogs/database/implement-event-driven-architectures-with-amazon-dynamodb/), chúng ta đã tìm hiểu cách sử dụng Amazon EventBridge Scheduler để xóa dữ liệu tự động trong Amazon DynamoDB một cách chính xác. [Phần 2](https://aws.amazon.com/blogs/database/implement-event-driven-architectures-with-amazon-dynamodb-part-2/) đã thảo luận cách sử dụng global secondary index (GSI) để quản lý dữ liệu nghiêm ngặt trong DynamoDB. Bài viết này tập trung vào việc sử dụng EventBridge Scheduler để lập lịch sự kiện chi tiết dựa trên dữ liệu ghi vào DynamoDB.
 
-Các hệ thống phân tán hiện đại phải có khả năng chống chịu lỗi trước các gián đoạn không mong muốn để duy trì tính khả dụng, hiệu suất và độ ổn định. [Chaos engineering](https://en.wikipedia.org/wiki/Chaos_engineering) giúp các nhóm phát hiện những điểm yếu tiềm ẩn bằng cách thực hiện fault injection lên hệ thống và quan sát cách nó phục hồi. Trong khi thử nghiệm truyền thống xác thực hành vi mong đợi, chaos engineering kiểm tra khả năng phục hồi của hệ thống trong suốt thời gian xảy ra lỗi. [AWS Fault Injection Service](https://aws.amazon.com/fis/) (AWS FIS) là một dịch vụ AWS được quản lý toàn diện giúp các nhóm chạy các thí nghiệm fault injection trên các workloads của AWS. Nó hỗ trợ các tình huống như chấm dứt [Amazon EC2 instances](https://aws.amazon.com/ec2/), điều tiết các [Amazon API Gateway](https://aws.amazon.com/api-gateway/) requests, và tạo độ trễ mạng. Điều này cho phép bạn xác thực khả năng phục hồi trong các môi trường giống như môi trường sản xuất. Mặc dù những khả năng này rất mạnh mẽ, nhiều lỗi thực tế chỉ ảnh hưởng đến một phần lưu lượng truy cập.
+Trong toàn bộ chuỗi bài, chúng tôi kiểm tra các chiến lược quản lý dữ liệu trong DynamoDB. Bài này chuyển sang mẫu hướng sự kiện để lên lịch hành động downstream tin cậy trong tương lai bằng EventBridge Scheduler. Một lợi thế của cách tiếp cận này là khả năng kích hoạt các sự kiện downstream quan trọng về thời gian, như gửi thông báo nhắc nhở các cuộc hẹn, hết hạn ưu đãi, hoặc gia hạn đăng ký. Ví dụ, khi đăng ký của người dùng sắp hết hạn, EventBridge Scheduler có thể kích hoạt một sự kiện gọi [AWS Lambda](https://aws.amazon.com/lambda/) kèm chi tiết item DynamoDB liên quan. Lambda này sau đó có thể dùng [Amazon Simple Email Service](https://aws.amazon.com/ses/) (Amazon SES) để gửi thông báo kịp thời tới người dùng.
 
-Trong bài đăng này, bạn sẽ tìm hiểu cách mô phỏng lỗi cục bộ. Một kiểu lỗi phổ biến nhưng ít được kiểm tra—bằng cách kết hợp AWS FIS với weighted routing trong [Application Load Balancer (ALB)](https://aws.amazon.com/elasticloadbalancing/application-load-balancer/) và một hàm [AWS Lambda](https://aws.amazon.com/lambda/) trả về các phản hồi lỗi tùy chỉnh. Phương pháp này cho phép bạn kiểm tra cách ứng dụng của bạn xử lý các điều kiện suy giảm mà không cần thay đổi mã hoặc làm gián đoạn luồng truy cập thông thường.
+Kiến trúc này giúp người dùng nhận được nhắc nhở đúng lúc, cải thiện trải nghiệm và tăng mức độ tương tác. EventBridge Scheduler linh hoạt cho phép kiểm soát chính xác thời gian thông báo, đáp ứng nhiều bài toán kinh doanh khác nhau.
 
-## **Tổng quan về giải pháp**
+## **Tổng quan giải pháp**
 
-Giải pháp của chúng tôi kết hợp AWS FIS với định tuyến có trọng số của ALB để điều hướng một tỷ lệ phần trăm lưu lượng truy cập có thể định cấu hình đến một hàm Lambda có thể trả về các lỗi mô phỏng. Cách tiếp cận này không yêu cầu thay đổi mã nguồn ứng dụng và sẽ tự động khôi phục về hoạt động bình thường sau khi kiểm thử.
-![](https://d2908q01vomqb2.cloudfront.net/972a67c48192728a34979d9a35164c1295401b71/2025/06/15/Experiment_Flow-1.png)
-  
-_Hình 1 Giải pháp này cho thấy cách sửa đổi Load Balancer của bạn một cách an toàn để mô phỏng lỗi trong quá trình thực hiện thử nghiệm và khôi phục an toàn sau khi kết thúc_
+Giải pháp này trình diễn cách sử dụng [Amazon DynamoDB Streams](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html) và AWS Lambda để tự động lên lịch hành động trong tương lai dựa trên việc ghi item vào DynamoDB. Bằng cách nhận stream records từ các lần ghi, một hàm Lambda được kích hoạt để tạo các lịch chi tiết theo thời gian qua Amazon EventBridge Scheduler. Những lịch này sau đó có thể gọi các dịch vụ downstream như Amazon SES để gửi email nhắc nhở, [Amazon Simple Queue Service](https://aws.amazon.com/sqs/) (Amazon SQS), [AWS Step Functions](https://aws.amazon.com/step-functions/) hoặc các dịch vụ AWS khác, cho phép quy trình hướng sự kiện có tính mở rộng, tin cậy cao.
 
-## **Lợi ích chính**
+Sơ đồ sau minh họa kiến trúc giải pháp.
 
-Giải pháp này cung cấp các lợi ích chính sau cho các nhóm triển khai kỹ thuật hỗn loạn:
+![][image1]
 
-  * Mô phỏng lỗi có kiểm soát.
-  * Không cần sửa đổi ứng dụng.
-  * Thiết lập và khôi phục tự động.
-  * Tỷ lệ lỗi có thể định cấu hình.
+Một trường hợp phổ biến cho mẫu này là lập lịch các sự kiện trong tương lai như nhắc nhở cuộc hẹn, hết hạn ưu đãi, hoặc gia hạn đăng ký với độ tin cậy cao. EventBridge Scheduler cho phép lập lịch hành động một lần hoặc lặp lại dựa trên thuộc tính lưu trong các item DynamoDB. Luồng hoạt động như sau:
 
+1. Ghi dữ liệu – Khi một item được ghi lên DynamoDB table, một bản ghi stream ứng sẽ được tạo trong DynamoDB stream được liên kết của nó.
 
+2. Kích hoạt – Bản ghi stream này, riêng lẻ hoặc trong batch, sẽ kích hoạt một AWS Lambda function.
 
-## **Hướng dẫn triển khai**
+3. Tạo lịch – Lambda function dùng EventBridge Scheduler để lên lịch trong tương lai. Lịch bao gồm timestamp chính xác và dữ liệu item liên quan.
 
-## **Điều kiện tiên quyết**
+4. Kích hoạt mục tiêu – Đến thời gian đã định, EventBridge Scheduler gọi mục tiêu cấu hình, ví dụ gửi email với Amazon SES, đưa message vào SQS, hoặc bắt đầu thực thi Step Functions.
 
-Trước khi bắt đầu, hãy xác minh bạn có:
+Kiến trúc này được thiết kế để mở rộng theo dữ liệu, cho phép lập lịch logic chính xác mà không làm phức tạp mô hình dữ liệu DynamoDB hoặc cần polling liên tục. Hãy tham khảo các bước áp dụng giải pháp.
 
-  * Một tài khoản AWS với quyền triển khai các stack [AWS CloudFormation](https://aws.amazon.com/cloudformation/) và quản lý các thí nghiệm AWS FIS.
-  * Một ALB hiện có được cấu hình với một target group định tuyến lưu lượng truy cập đến một microservice đang chạy.
-  * ALB phải đã hoạt động và có thể truy cập công khai để kiểm tra các lỗi mô phỏng.
-  * Truy cập vào [AWS Command Line Interface](https://aws.amazon.com/cli/)(AWS CLI) hoặc AWS Management Console.
+## **Yêu cầu trước**
 
+Trước khi áp dụng giải pháp hướng sự kiện, bạn cần phải có các yêu cầu sau:
 
+* **Tài khoản AWS** – Truy cập một [tài khoản AWS](https://aws.amazon.com/free) đang hoạt động.
 
-## **Bước 1: Triển khai mẫu CloudFormation**
+* **Kiến thức cơ bản về DynamoDB** – Hiểu về [khái niệm DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html): bảng, item, thuộc tính, thao tác CRUD cơ bản là cần thiết để cấu hình và quản lý cơ sở dữ liệu một cách hiệu quả.
 
-Mẫu CloudFormation thiết lập tất cả các tài nguyên cần thiết, bao gồm:
+* **Lambda functions** – Thành thạo Lambda vì bạn sẽ tạo và triển khai Lambda function để xử lý sự kiện [Amazon DynamoDB Streams](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html) và tạo lịch qua EventBridge Scheduler.
 
-  * Một hàm Lambda để mô phỏng các phản hồi lỗi.
-  * Một tài liệu [AWS Systems Manager (SSM)](https://aws.amazon.com/systems-manager/) automation.
-  * Một IAM Role cấp quyền cho AWS FIS để gọi tài liệu SSM Automation.
-  * Một [AWS FIS experiment template](https://docs.aws.amazon.com/fis/latest/userguide/experiment-template-example.html) được cấu hình sẵn.
+* **EventBridge Scheduler** – Kiến thức cơ bản về [Amazon EventBridge](https://aws.amazon.com/eventbridge/) là cần thiết cho việc cấu hình EventBridge Scheduler rule để gọi API cụ thể.
 
+* **Amazon SES** – Kiến thức cơ bản về [Amazon SES](https://docs.aws.amazon.com/ses/latest/dg/Welcome.html) và xác thực email người gửi. Để tạo và xác thực địa chỉ email, xem tại [Creating and verifying identities in Amazon SES](https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html).
 
-![](https://d2908q01vomqb2.cloudfront.net/972a67c48192728a34979d9a35164c1295401b71/2025/06/15/Overall_Architecture-2.png)
-  
-_Hình 2 Cái nhìn cấp cao về các thành phần giải pháp và sự tương tác của chúng._
+* **Thành thạo AWS CLI hoặc console** – Thành thạo dùng [AWS Command Line Interface](https://aws.amazon.com/cli/) (AWS CLI) hoặc [AWS Management Console](https://aws.amazon.com/console/) cho việc cấu hình dịch vụ, tạo resource và giám sát log.
 
-## **Các tham số thí nghiệm có thể định cấu hình**
+## **Tạo bảng DynamoDB**
 
-Mẫu CloudFormation yêu cầu ba tham số sau khi triển khai:
+Hoàn thành các bước sau để tạo DynamoDB table:
 
-  * Tên Application Load Balancer.
-  * ARN của Listener ALB rule cần sửa đổi.
-  * Thời lượng kiểm tra bằng giây — lỗi cục bộ nên kéo dài bao lâu.
+1. Ở DynamoDB console, chọn **Tables** ở thanh điều hướng.
 
+2. Chọn **Create table**.
 
+3. Vói **tên Table**, nhập tên table của bạn.
 
-Các cài đặt thí nghiệm khác, chẳng hạn như tỷ lệ phần trăm lưu lượng truy cập cần chuyển hướng và mã phản hồi Lambda, được cấu hình sẵn trong định nghĩa thí nghiệm. Nếu bạn muốn tùy chỉnh các giá trị này, bạn có hai tùy chọn:
+4. Với **Partition key**, nhập PK làm tên, chọn kiểu **String** làm kiểu dữ liệu.
 
-**Tùy chọn 1: Sửa đổi Mẫu CloudFormation và triển khai lại**
+5. Với **Sort key**, nhập SK làm tên, chọn kiểu **String** làm kiểu dữ liệu.
 
-Bạn có thể chỉnh sửa trường `documentParameters` trong phần định nghĩa thí nghiệm của mẫu để thay đổi:
+![][image2]
 
-  * FailurePercentage (ví dụ: 10, 50, 100).
+6. Để mặc định các cấu hình khác, chọn **Create table**. Bảng sẽ tạo sau vài giây.
 
+7. Vào lại **Tables**, mở bảng vừa tạo.
 
+8. Trong mục **DynamoDB stream details**, chọn **Turn on**.
 
-Để thay đổi HTTP status code được hàm Lambda trả về (ví dụ: từ 500 thành 404), hãy sửa đổi giá trị `statusCode` trực tiếp trong khối mã nội tuyến bên trong mẫu.
+![][image3]
 
-Sau khi chỉnh sửa, hãy triển khai lại stack để áp dụng các thay đổi của bạn.
+9. Chọn **New and old images**, sau đó chọn **Turn on stream**.
 
-**Tùy chọn 2: Tạo phiên bản mới của tài liệu SSM Automation**
+![][image4]
 
-Nếu bạn không muốn triển khai lại stack:
+Điều này sẽ cho phép Luồng DynamoDB trên bảng hiển thị cả trạng thái cũ và mới của các mục trong bản ghi stream, để bạn có thể quản lý các cập nhật giá trị Time to Live (TTL) của các item.
 
-  1. Truy cập vào **AWS Systems Manager** **→** **Documents** console.
-  2. Định vị tài liệu SSM được tạo bởi mẫu.
-  3. Chọn **Create new version** và điều chỉnh các giá trị mặc định như FailurePercentage.
-  4. Sử dụng phiên bản đã cập nhật bằng cách tham chiếu nó trong một thí nghiệm AWS FIS mới (thông qua CLI hoặc console).
+## **Tạo Lambda function**
 
+Hoàn thành các bước sau để tạo Lambda function:
 
+1. Vào console Lambda, chọn **Functions**.
 
-**IAM Permissions:**
+2. Chọn **Create function**.
 
-Bạn cần có quyền tạo các IAM role và policy khi triển khai CloudFormation template. Khi triển khai thông qua AWS Management Console, bạn sẽ cần xác nhận rằng template tạo ra các tài nguyên IAM. Nếu sử dụng AWS CLI, hãy thêm flag `--capabilities CAPABILITY_NAMED_IAM`.
+3. Chọn **Author from scratch**.
 
-**Tải xuống template:** Bạn có thể tải xuống [CloudFormation template tại đây](https://d2908q01vomqb2.cloudfront.net/artifacts/MTBlog/cloudops-1899/fis_template.yaml) và lưu cục bộ dưới dạng `fis_template.yaml` trước khi triển khai nó thông qua AWS Console hoặc CLI.
-    
-    
-  ```bash
-aws cloudformation create-stack --stack-name alb-fis-experiment \
-    --template-body file://fis_template.yaml \
-    --parameters \
-        ParameterKey=LoadBalancerName,ParameterValue=LoadBalancerName \
-        ParameterKey=ListenerRuleArn,ParameterValue=RuleARN \
-        ParameterKey=TestDurationInSeconds,ParameterValue=60 \
-    --capabilities CAPABILITY_NAMED_IAM
+4. Đối với **Function name**, hãy nhập tên (ví dụ: DDBStreamTriggerEventScheduler).
+
+5. Chọn **Runtime** Node.js mới nhất.
+
+6. Đối với vai trò dịch vụ Lambda mà bạn đã gắn vào function, hãy thêm chính sách được quản lý [AWS Identity and Access Management](https://aws.amazon.com/iam/) (IAM) AWSLambdaDynamoDBExecutionRole và một chính sách nội tuyến có quyền lên lịch: CreateSchedule.
+
+7. Chọn **Create function**.
+
+![][image5]
+
+8. Sau khi tạo Lambda function, chọn **Add trigger** để cấu hình event source mapping cho bảng DynamoDB.
+
+9. Chọn **DynamoDB** làm source.
+
+10. Đối với **DynamoDB table**, hãy nhập ARN cho Appointment-Table.
+
+11. Để mặc định các cấu hình còn lại, chọn **Add** để tạo trigger.
+
+![][image6]
+
+12. Ở tab **Code** của Lambda function, thay code mặc định bằng đoạn mã Node.js sau. Đảm bảo cập nhật phần giữ chỗ với các giá trị thích hợp—chẳng hạn như thay thế ses-verified-email@example.com bằng địa chỉ email Amazon SES đã được xác minh của bạn. Ngoài ra, hãy đảm bảo rằng vai trò IAM mà EventBridge Scheduler sử dụng có quyền ses:SendEmail.
+
 ```
-`LoadBalancerName` và `RuleARN` đề cập đến tên Load Balancer và ARN đầy đủ của Listener rule trước dịch vụ mà bạn muốn mô phỏng lỗi. 60 chỉ định thời lượng của lỗi mô phỏng bằng giây.
+import { SchedulerClient, CreateScheduleCommand } from "@aws-sdk/client-scheduler";
 
-**Lưu ý:** `FISExperimentRole` IAM policy sử dụng `"Resource": "*"` cho các hành động nhất định để cho phép AWS FIS sửa đổi các tài nguyên Load Balancer được tạo động. Bởi vì tên tài nguyên như ARN của target group không được biết tại thời điểm triển khai, nên việc giới hạn phạm vi các quyền này là không khả thi trong ngữ cảnh của bài đăng này. Mặc dù điều này mang lại sự linh hoạt, [AWS security best practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html) khuyến nghị giới hạn phạm vi quyền đối với các tài nguyên cụ thể bất cứ khi nào có thể. Nếu bạn biết chính xác các tài nguyên sẽ được sử dụng, hãy cân nhắc cập nhật chính sách để hạn chế quyền truy cập cho phù hợp.
+const client = new SchedulerClient({ region: "eu-west-1" }); 
 
-## **Bước 2: Xác minh Hàm Lambda**
-
-Sau khi triển khai, hãy kiểm tra hàm Lambda trong AWS console để xác nhận nó trả về phản hồi lỗi mong đợi. Hàm phải trả về nội dung như sau:
+export const handler = async (event) => {
+  try {
+    for (const record of event.Records) {
+      let params = {
+        eventID: record.eventID,
+        sequenceNumber: record.dynamodb.SequenceNumber,
+        email: record.dynamodb.NewImage.email.S,           
+        subject: "Time for your appointment",   
+        reminderTS: record.dynamodb.NewImage.REMINDER_TIMESTAMP.S, // Expects ISO format
+      };
+      
+      params.body = "This is the email body, you have a reminder"; 
+      
+      await scheduleEmail(params);
+    }
     
-    
- ```json
-{
-  "statusCode": 503,
-  "body": "Service Unavailable - Simulated Error Response"
-}
+    return {
+      statusCode: 200,
+      body: JSON.stringify('Complete'),
+    };
+  } catch (error) {
+    console.error("Error processing event: ", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: 'Error processing event', error: error.message }),
+    };
+  }
+};
+
+const scheduleEmail = async (params) => {
+  try {
+    const sesParams = {
+      Destination: { ToAddresses: [params.email] },
+      Message: {
+        Body: { Text: { Data: params.body } },
+        Subject: { Data: params.subject },
+      },
+      Source: "ses-verified-email@example.com",
+    };
+
+    const target = {
+      RoleArn: "arn:aws:iam::YOUR_ACCOUNT_ID:role/YourSchedulerRole", 
+      
+      Arn: "arn:aws:scheduler:::aws-sdk:ses:sendEmail",
+      
+      Input: JSON.stringify(sesParams),
+    };
+
+    const schedulerInput = {
+      Name: `Appointment_Reminder_${params.eventID}`,
+      FlexibleTimeWindow: { Mode: "OFF" },
+      ActionAfterCompletion: "DELETE",
+      Target: target,
+      ScheduleExpression: `at(${params.reminderTS})`,
+      ClientToken: params.sequenceNumber,
+    };
+
+    const command = new CreateScheduleCommand(schedulerInput);
+    const result = await client.send(command);
+    return result;
+
+  } catch (error) {
+    console.error("Error scheduling email: ", error);
+    throw new Error(`Failed to schedule email: ${error.message}`);
+  }
+};
 ```
 
-## **Bước 3: Bắt đầu Thí nghiệm AWS FIS**
+13. Chọn **Deploy** để triển khai code mới nhất.
 
-  1. Mở AWS Fault Injection Service console.
-  2. Định vị template được cấu hình sẵn trong Experiment Templates.
-  3. Chọn Start experiment.
-  4. Xác nhận và khởi chạy kiểm tra.
+Mẹo: Để cải thiện độ tin cậy và khả năng theo dõi, bạn có thể định cấu hình [Dead Letter Queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html) (DLQ) tại hai điểm trong kiến ​​trúc này. Trước tiên, bạn có thể thêm DLQ vào Lambda function sử dụng từ DynamoDB stream, thao tác này ghi lại mọi lỗi xảy ra trong khi xử lý bản ghi stream hoặc tạo lịch trình, chẳng hạn như lỗi đầu vào hoặc lỗi quyền hạn. Thứ hai, bạn có thể định cấu hình DLQ như một phần của EventBridge Scheduler target. Điều này ghi lại các lỗi xảy ra tại thời điểm thực thi, chẳng hạn như nếu Amazon SES không gửi được email hoặc dịch vụ đích không khả dụng. Việc sử dụng cả hai DLQ cho phép bạn theo dõi, phân tích và thử lại các lỗi trong toàn bộ vòng đời lập kế hoạch và phân phối.
 
+## **Sinh dữ liệu mẫu để kiểm tra giải pháp**
 
-![](https://d2908q01vomqb2.cloudfront.net/972a67c48192728a34979d9a35164c1295401b71/2025/06/13/Fis_Console-2.png)
+Chạy lệnh AWS CLI sau để mô phỏng hoạt động ghi vào DynamoDB table của bạn. Vòng lặp này chèn 10 items mẫu vào bảng, mỗi mục có một khóa phân vùng duy nhất (PK) và một khóa sắp xếp tĩnh (SK). Mỗi mục bao gồm REMINDER\_TIMESTAMP được đặt thành 3 phút kể từ thời điểm hiện tại và địa chỉ email kiểm tra. Những lần ghi này sẽ kích hoạt DynamoDB Stream, luồng này gọi Lambda function của bạn để lên lịch gửi email nhắc nhở thông qua EventBridge Scheduler. Hãy nhớ thay thế abc@example.com bằng địa chỉ email hợp lệ, đã được xác minh trong Amazon SES để quan sát toàn bộ quy trình của giải pháp.
 
-_Hình 3 AWS FIS console hiển thị experiment template tùy chỉnh được tạo bởi mẫu CloudFormation._
-
-Khi bạn bắt đầu thí nghiệm, AWS FIS sẽ gọi một AWS Systems Manager Automation Document được tạo trong quá trình triển khai. Automation này thực hiện các hành động sau:
-
-  1. **Tạo một ALB target group mới** trỏ đến một hàm Lambda được cấu hình để trả về các error responses mô phỏng.
-  2. **Sửa đổi một ALB Listener rule** để chia một phần lưu lượng truy cập đến target group mới này, mô phỏng hiệu quả một lỗi cục bộ.
-  3. **Đợi trong một khoảng thời gian xác định** (có thể định cấu hình thông qua CloudFormation template).
-  4. **Khôi phục ALB listener rule** về trạng thái ban đầu và xóa target group tạm thời.
-
-
-
-Toàn bộ vòng đời này được tự động hóa — bạn không cần viết bất kỳ mã nào hoặc thực hiện cập nhật thủ công nào cho Load Balancer của mình. Tất cả những gì bạn làm là bắt đầu thí nghiệm từ FIS console và quan sát cách dịch vụ của bạn phản hồi với một trường hợp lỗi cục bộ được kiểm soát.
-
-Trong ảnh chụp màn hình sau, bạn sẽ thấy quy tắc **Listener ALB** ban đầu chỉ được cấu hình với target group mặc định.
-
-![](https://d2908q01vomqb2.cloudfront.net/972a67c48192728a34979d9a35164c1295401b71/2025/06/13/Before.png)
-  
-_Hình 4 ALB listener rule trước khi thí nghiệm bắt đầu, hiển thị một target group duy nhất nhận 100% lưu lượng truy cập._
-
-Sau khi thí nghiệm bắt đầu, AWS FIS sửa đổi rule để chia lưu lượng truy cập — như được hiển thị trong ảnh chụp màn hình Sau.
-  
-![](https://d2908q01vomqb2.cloudfront.net/972a67c48192728a34979d9a35164c1295401b71/2025/06/13/After.png)
-
-_Hình 5 ALB listener rule sau khi thí nghiệm bắt đầu, hiển thị một target group mới với Lambda được cấu hình để nhận 50% lưu lượng truy cập và phản hồi bằng một mã lỗi được xác định trước._
-
-## **Bước 4: Quan sát và phân tích kết quả**
-
-Bạn có thể xác thực thí nghiệm bằng cách làm mới **ALB DNS** trong trình duyệt của bạn hoặc chạy một **curl loop**:
-    
-    
-  ```bash
-while true; do curl -s http://<your-alb-dns-name>; sleep 1; done
 ```
-![](https://d2908q01vomqb2.cloudfront.net/972a67c48192728a34979d9a35164c1295401b71/2025/06/13/curl_test.gif)
+#!/bin/bash
+TABLE="Appointment-Table"
+
+for PK_VALUE in {1..10}; do
+  ISO_TIMESTAMP_PLUS_3_MINS=$(date -v+3M -u +"%Y-%m-%dT%H:%M:%S")
   
-_Hình 6 Đầu ra CLI động hiển thị các yêu cầu lặp lại đến URL ALB trong một vòng lặp để chứng minh cách giải pháp tiêm lỗi._
+  aws dynamodb put-item --table-name $TABLE \
+    --item '{"PK": {"S": "'$PK_VALUE'"}, "SK": {"S": "StaticSK"}, "REMINDER_TIMESTAMP": {"S": "'$ISO_TIMESTAMP_PLUS_3_MINS'"}, "email": {"S": "abc@example.com"}, "ATTR_1": {"S": "This is a static attribute"}}'
+done
+```
 
-Bạn sẽ thấy đầu ra xen kẽ như:
+Để theo dõi các email nhắc nhở đang được gửi, hãy điều hướng đến **Monitoring** tab của EventBridge schedule group. Bạn có thể xem các sự kiện được EventBridge Scheduler gọi vào một thời điểm cụ thể bằng cách xem số liệu InvocationAttemptCount. Trong trường hợp của chúng ta, lời gọi là các email nhắc nhở cuộc hẹn tới người dùng thông qua Amazon SES. Để có danh sách tất cả số liệu có sẵn cho một schedule group, tham khảo [Monitoring Amazon EventBridge Scheduler with Amazon CloudWatch](https://docs.aws.amazon.com/scheduler/latest/UserGuide/monitoring-cloudwatch.html).
 
-  * Backend service is healthy (dịch vụ backend đang hoạt động tốt)
-  * Service Unavailable – Simulated Error Response (Lambda)
-
-
-Bạn có thể giám sát Amazon CloudWatch Logs để xem các chỉ số thực thi hàm Lambda và hành vi của ứng dụng (logic thử lại, cơ chế chuyển đổi dự phòng)
-
-**Lưu ý:** Sau khi bắt đầu thí nghiệm, có thể mất đến một phút trước khi target group mới được gắn vào ALB và lưu lượng truy cập bắt đầu định tuyến đến hàm Lambda. Trong khoảng thời gian ngắn này, tất cả các yêu cầu có thể tiếp tục đến dịch vụ backend ban đầu.
-
-## **Cơ chế khôi phục**
-
-Thí nghiệm nhằm mục đích giúp ích cho các hoạt động khôi phục, mặc dù nên kiểm tra trong môi trường của bạn:
-
-  * ALB rule sẽ tự động được khôi phục vào cuối thời gian kiểm tra.
-  * Target group tạm thời được gỡ bỏ và xóa để ngăn chặn bất kỳ cấu hình còn sót lại nào.
-  * Nếu thí nghiệm bị hủy, quy trình khôi phục sẽ đưa hệ thống trở lại trạng thái ban đầu.
-
-
-
-## **Các điểm cần cân nhắc**
-
-Bài đăng này cung cấp thông tin kỹ thuật và cấu hình ví dụ. Việc triển khai trong môi trường của bạn có thể yêu cầu thêm các cân nhắc về bảo mật, tuân thủ và kỹ thuật. Luôn kiểm tra kỹ lưỡng trước trong các môi trường phi sản xuất.
+![][image7]
 
 ## **Dọn dẹp**
 
-Để tránh phát sinh chi phí trong tương lai, hãy xóa các tài nguyên đã triển khai:
-    
-    
-  ```bash
-aws cloudformation delete-stack --stack-name alb-fis-experiment
-```
-## **Kết luận**
+Nếu bạn dựng môi trường test theo bài viết, nhớ [xoá DynamoDB table](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeleteTable), [Lambda function](https://docs.aws.amazon.com/cli/latest/reference/lambda/delete-function.html), [EventBridge schedule](https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule-delete.html) và các resource khác đã tạo để tiết kiệm chi phí.
 
-Trong bài đăng này, chúng tôi đã chứng minh cách mở rộng khả năng của AWS FIS bằng cách mô phỏng lỗi cục bộ cho các workload đằng sau ALB bằng cách sử dụng Lambda. Giải pháp này cho phép các nhóm kiểm tra khả năng phục hồi của ứng dụng đối với các lỗi không liên tục mà không gây ra sự cố ngừng hoạt động hoàn toàn. Bằng cách tận dụng AWS FIS, Lambda, và các ALB routing rules, bạn có thể tạo ra các kịch bản lỗi có kiểm soát và tăng cường độ vững chắc của hệ thống.
+## **Tóm tắt**
 
-Để tìm hiểu thêm, hãy khám phá các tài nguyên sau:
+Trong bài viết này, chúng ta đã được trình bày cách dùng EventBridge Scheduler để lập lịch sự kiện chi tiết dựa trên dữ liệu ghi ở DynamoDB. Giải pháp này cho phép bạn thực hiện các hành động chính xác, kịp thời dựa trên dấu thời gian được lưu trữ trong DynamoDB items khi bạn muốn gửi thông báo có giới hạn thời gian hoặc gọi các downstream jobs.
 
-  * [Tài liệu AWS Fault Injection Service](https://docs.aws.amazon.com/fis/latest/userguide/)
-  * [Tài liệu Amazon ALB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/)
-  * [Sử dụng SSM Systems Manager document với AWS FIS](https://docs.aws.amazon.com/fis/latest/userguide/actions-ssm-agent.html)
+Trong loạt bài gồm ba phần này, chúng ta đã khám phá cách mở rộng các khả năng gốc của Amazon DynamoDB bằng cách sử dụng các mẫu kiến ​​trúc hướng sự kiện được điều chỉnh cho phù hợp với nhu cầu trong thế giới thực:
 
+* [**Phần 1**](https://aws.amazon.com/blogs/database/implement-event-driven-architectures-with-amazon-dynamodb/): Giới thiệu giải pháp TTL gần real-time, dùng EventBridge Scheduler xóa item quá hạn bằng độ chính xác cao hơn TTL gốc.
 
+* [**Phần 2**](https://aws.amazon.com/blogs/database/implement-event-driven-architectures-with-amazon-dynamodb-part-2/): Trình bày cách xây dựng giải pháp quản lý dữ liệu nghiêm ngặt bằng cách sử dụng sharded global secondary index (GSI), EventBridge Scheduler và Lambda để truy vấn định kỳ và loại bỏ các bản ghi đã hết hạn.
 
-Bắt đầu với [CloudFormation template](https://d2908q01vomqb2.cloudfront.net/artifacts/MTBlog/cloudops-1899/fis_template.yaml) và chia sẻ kinh nghiệm của bạn trong phần bình luận bên dưới.
+* **Phần 3**: Tập trung vào việc sử dụng DynamoDB Streams và EventBridge Scheduler để lên lịch các hành động xuôi dòng trong tương lai dựa trên dữ liệu được ghi vào DynamoDB table, chẳng hạn như gửi email nhắc nhở cho các cuộc hẹn sắp tới.
 
-TAGS: [aws fault injection simulator](https://aws.amazon.com/blogs/mt/tag/aws-fault-injection-simulator/), [chaos engineering](https://aws.amazon.com/blogs/mt/tag/chaos-engineering/)
+Để tìm hiểu sâu hơn và khám phá thêm best practice thiết kế với DynamoDB, EventBridge tại [tài liệu Amazon DynamoDB](https://docs.aws.amazon.com/dynamodb/index.html) và [tài liệu Amazon EventBridge](https://docs.aws.amazon.com/eventbridge/latest/userguide/what-is-eventbridge.html).
 
-### Ozgur Canibeyaz
+---
 
-![](https://d2908q01vomqb2.cloudfront.net/972a67c48192728a34979d9a35164c1295401b71/2025/06/13/canibeya.jpeg)
+**Về các tác giả**
 
+| ![][image8] Lee Hannigan [Lee](https://www.linkedin.com/in/lee-hannigan/) Hannigan là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Donegal, Ireland. Anh có chuyên môn sâu rộng về các hệ thống phân tán (distributed systems), cùng nền tảng vững chắc về các công nghệ dữ liệu lớn (big data) và phân tích (analytics technologies). Trong vai trò Chuyên gia giải pháp DynamoDB, Lee xuất sắc trong việc hỗ trợ khách hàng thiết kế, đánh giá và tối ưu hóa khối lượng công việc (workloads) sử dụng các khả năng của DynamoDB. |
+| :---- |
 
-Ozgur là Senior Technical Account Manager tại Amazon Web Services với 8 năm kinh nghiệm. Ozgur giúp khách hàng tối ưu hóa việc sử dụng AWS của họ bằng cách xử lý các thách thức kỹ thuật, khám phá các cơ hội tiết kiệm chi phí, đạt được sự xuất sắc trong vận hành và xây dựng các dịch vụ sáng tạo bằng các sản phẩm AWS.
+| ![][image9] Aman Dhingra [Aman](https://www.linkedin.com/in/amdhing/) Dhingra là Chuyên gia giải pháp DynamoDB cao cấp (Sr. DynamoDB Specialist Solutions Architect) làm việc tại Dublin, Ireland. Anh có đam mê về các hệ thống phân tán (distributed systems) và nền tảng chuyên sâu về dữ liệu lớn & phân tích (big data & analytics). Aman là tác giả của cuốn "Amazon DynamoDB – The Definitive Guide" và hỗ trợ khách hàng trong việc thiết kế, đánh giá và tối ưu hóa khối lượng công việc vận hành trên Amazon DynamoDB. |
+| :---- |
 
-### Pablo Colazurdo
-![](https://d2908q01vomqb2.cloudfront.net/972a67c48192728a34979d9a35164c1295401b71/2025/06/15/pablo.png)
-
-Pablo là Principal Solutions Architect tại AWS, nơi anh ấy thích giúp khách hàng ra mắt các dự án thành công trên Cloud. Anh ấy có nhiều năm kinh nghiệm làm việc với nhiều công nghệ đa dạng và đam mê học hỏi những điều mới. Pablo lớn lên ở Argentina nhưng hiện đang tận hưởng cơn mưa ở Ireland trong khi nghe nhạc, đọc sách hoặc chơi D&D với các con.
+[image1]: /images/3-Blog/Blog-3/image_1.png
+[image2]: /images/3-Blog/Blog-3/image_2.png
+[image3]: /images/3-Blog/Blog-3/image_3.png
+[image4]: /images/3-Blog/Blog-3/image_4.png
+[image5]: /images/3-Blog/Blog-3/image_5.png
+[image6]: /images/3-Blog/Blog-3/image_6.png
+[image7]: /images/3-Blog/Blog-3/image_7.png
+[image8]: /images/3-Blog/Blog-1/image_11.png
+[image9]: /images/3-Blog/Blog-1/image_12.png

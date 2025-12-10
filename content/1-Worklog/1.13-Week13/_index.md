@@ -21,7 +21,7 @@ Complete the project and submit.
 
 ### Week 13 Achievements:
 
-* Extended the CDK codebase to define Lambda, CloudFront, and API Gateway resources for the dashboard path end-to-end. [web:54]
-* Designed and documented the integration of Amazon Cognito into the architecture to support authenticated access to the dashboard. [web:59]
-* Successfully deployed and debugged CDK stacks, then merged multiple team stacks into a single deployable application. [web:54]
-* Managed time between project delivery and family responsibilities at the end of the week. [web:54]
+* Extended the CDK codebase to define Lambda, CloudFront, and API Gateway resources for the dashboard path end-to-end.
+* Designed and documented the integration of Amazon Cognito into the architecture to support authenticated access to the dashboard.
+* Successfully deployed and debugged CDK stacks, then merged multiple team stacks into a single deployable application.
+* Managed time between project delivery and family responsibilities at the end of the week.

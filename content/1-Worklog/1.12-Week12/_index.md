@@ -24,7 +24,7 @@ pre: " <b> 1.12. </b> "
 
 ### Week 12 Achievements:
 
-* Organized code collaboration by joining the existing GitHub organization and structuring repos for the project. [web:39]
-* Improved Athena performance by enabling partition projection on key tables, reducing query planning overhead and scanned data. [web:34]
-* Enhanced the dashboard’s UI for readability and demo readiness, and migrated its deployment pipeline from GitHub to GitLab CI with S3 + CloudFront. [web:39]
-* Bootstrapped an AWS CDK stack for the dashboard, starting with S3 and IAM definitions to move towards full infrastructure-as-code. [web:39]
+* Organized code collaboration by joining the existing GitHub organization and structuring repos for the project.
+* Improved Athena performance by enabling partition projection on key tables, reducing query planning overhead and scanned data.
+* Enhanced the dashboard’s UI for readability and demo readiness, and migrated its deployment pipeline from GitHub to GitLab CI with S3 + CloudFront.
+* Bootstrapped an AWS CDK stack for the dashboard, starting with S3 and IAM definitions to move towards full infrastructure-as-code.

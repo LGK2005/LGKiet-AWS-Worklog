@@ -23,7 +23,7 @@ pre: " <b> 1.11. </b> "
 
 ### Week 11 Achievements:
 
-* Learned CDK and CloudFormation concepts from AWS Cloud Mastery Series #2 and gathered demo strategy feedback from mentors. [web:14]
-* Successfully connected the React dashboard to a REST API built with API Gateway and Lambda, verifying proxy integration and basic JSON responses. [web:14]
-* Implemented a Lambda function capable of running Athena queries and returning results, enabling data-driven views in the dashboard. [web:23]
-* Simplified and validated the external architecture by testing the flow CloudFront → API Gateway → Lambda without Route 53, and prepared to codify this in AWS CDK. [web:14][web:23]
+* Learned CDK and CloudFormation concepts from AWS Cloud Mastery Series #2 and gathered demo strategy feedback from mentors.
+* Successfully connected the React dashboard to a REST API built with API Gateway and Lambda, verifying proxy integration and basic JSON responses.
+* Implemented a Lambda function capable of running Athena queries and returning results, enabling data-driven views in the dashboard.
+* Simplified and validated the external architecture by testing the flow CloudFront → API Gateway → Lambda without Route 53, and prepared to codify this in AWS CDK.

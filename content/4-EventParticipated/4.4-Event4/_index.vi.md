@@ -1,125 +1,242 @@
 ---
-title: "Event 2"
-date: "2000-01-01"
-weight: 1
+title: "Event 4"
+date: "2025-11-19"
+weight: 4
 chapter: false
-pre: " <b> 4.2. </b> "
+pre: " <b> 4.4. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
+# Báo cáo sự kiện: “Secure Your Applications: AWS Perimeter Protection Workshop”
 
-# Bài thu hoạch “GenAI-powered App-DB Modernization workshop”
+### Mục tiêu sự kiện
 
-### Mục Đích Của Sự Kiện
+- Giới thiệu Amazon CloudFront như nền tảng cho bảo vệ vành đai (perimeter protection).
+- Giải thích AWS WAF và các mô hình bảo vệ ở tầng ứng dụng.
+- Thực hành: Tối ưu một web app bằng CloudFront.
+- Thực hành: Bảo vệ web app internet-facing bằng WAF.
 
-- Chia sẻ best practices trong thiết kế ứng dụng hiện đại
-- Giới thiệu phương pháp DDD và event-driven architecture
-- Hướng dẫn lựa chọn compute services phù hợp
-- Giới thiệu công cụ AI hỗ trợ development lifecycle
+### Diễn giả
 
-### Danh Sách Diễn Giả
+- **Nguyen Gia Hung** – Head of Solution Architect  
+- **Julian Ju** – Senior Edge Services Specialist Solutions Architect  
+- **Kevin Lim** – Senior Edge Services Specialist GTM  
 
-- **Jignesh Shah** - Director, Open Source Databases
-- **Erica Liu** - Sr. GTM Specialist, AppMod
-- **Fabrianne Effendi** - Assc. Specialist SA, Serverless Amazon Web Services
+---
 
-### Nội Dung Nổi Bật
+### Nội dung chính
 
-#### Đưa ra các ảnh hưởng tiêu cực của kiến trúc ứng dụng cũ
+## Amazon CloudFront
 
-- Thời gian release sản phẩm lâu → Mất doanh thu/bỏ lỡ cơ hội
-- Hoạt động kém hiệu quả → Mất năng suất, tốn kém chi phí
-- Không tuân thủ các quy định về bảo mật → Mất an ninh, uy tín
+### Nhu cầu bảo mật và vị trí CloudFront
 
-#### Chuyển đổi sang kiến trúc ứng dụng mới - Microservice Architecture
+Các nhóm khách hàng khác nhau cần mức độ bảo vệ khác nhau:
 
-Chuyển đổi thành hệ thống modular – từng chức năng là một **dịch vụ độc lập** giao tiếp với nhau qua **sự kiện** với 3 trụ cột cốt lõi:
+- **Chủ website nhỏ:** Cần lớp bảo vệ đơn giản, chi phí thấp.  
+- **Doanh nghiệp tầm trung:** Cần che chắn trước DDoS, bot và traffic độc hại.  
+- **Doanh nghiệp lớn/đang scale:** Cần cấu hình nâng cao như origin failover, origin offload và tích hợp chặt với WAF, Shield.
 
-- **Queue Management**: Xử lý tác vụ bất đồng bộ
-- **Caching Strategy:** Tối ưu performance
-- **Message Handling:** Giao tiếp linh hoạt giữa services
+CloudFront được trình bày như lớp edge nền tảng cho cả ba nhóm: giá dễ dự đoán, phủ toàn cầu, tích hợp sâu với các dịch vụ bảo mật của AWS.
 
-#### Domain-Driven Design (DDD)
+### CloudFront Flat-Rate Pricing
 
-- **Phương pháp 4 bước**: Xác định domain events → sắp xếp timeline → identify actors → xác định bounded contexts
-- **Case study bookstore**: Minh họa cách áp dụng DDD thực tế
-- **Context mapping**: 7 patterns tích hợp bounded contexts
+CloudFront hiện có các gói trả phí trọn gói, gom CDN, WAF, DDoS protection, DNS và storage vào một mức phí/tháng:
 
-#### Event-Driven Architecture
+- **Gói:**
+  - Free: 0 USD/tháng  
+  - Pro: 15 USD/tháng  
+  - Business: 200 USD/tháng  
+  - Premium: 1000 USD/tháng  
 
-- **3 patterns tích hợp**: Publish/Subscribe, Point-to-point, Streaming
-- **Lợi ích**: Loose coupling, scalability, resilience
-- **So sánh sync vs async**: Hiểu rõ trade-offs (sự đánh đổi)
+- **Ví dụ mức sử dụng:**
+  - Free: 1M request + 100 GB data  
+  - Pro: 10M request + 50 TB data  
+  - Business: 125M request + 50 TB data  
+  - Premium: 500M request + 50 TB data  
 
-#### Compute Evolution
+Khi vượt “soft limit”, CloudFront không tính phí vượt ngay mà có thể giảm hiệu năng và cảnh báo để bạn nâng gói hoặc tối ưu.
 
-- **Shared Responsibility Model**: Từ EC2 → ECS → Fargate → Lambda
-- **Serverless benefits**: No server management, auto-scaling, pay-for-value
-- **Functions vs Containers**: Criteria lựa chọn phù hợp
+### Bảo vệ vành đai với CloudFront
 
-#### Amazon Q Developer
+- **Phòng thủ phân tán:** Tấn công được “hấp thụ” tại edge gần attacker thay vì đánh thẳng vào origin.  
+- **Tích hợp AWS Shield Advanced:** Có thêm visibility cho DDoS layer hạ tầng và được SRT hỗ trợ 24/7.  
+- **Giảm tấn công volumetric:** STN proxy và global routing giúp giảm SYN flood và các tấn công volume lớn ngay trên đường đi.
 
-- **SDLC automation**: Từ planning đến maintenance
-- **Code transformation**: Java upgrade, .NET modernization
-- **AWS Transform agents**: VMware, Mainframe, .NET migration
+---
 
-### Những Gì Học Được
+### Tối ưu chi phí với CloudFront
 
-#### Tư Duy Thiết Kế
+- **Giảm/miễn phí egress:** Data từ nhiều dịch vụ AWS về CloudFront thường rẻ hơn hoặc miễn phí so với egress trực tiếp ra internet.  
+- **Nén HTTP:** Nén nội dung có thể giảm kích thước payload rất nhiều, tăng tốc và giảm băng thông.  
+- **Tối ưu TLS:**
+  - Tự động cấp và gia hạn chứng chỉ (ACM).  
+  - HTTPS miễn phí với policy bảo mật sẵn cho cipher/TLS.  
+  - Hỗ trợ TLS hiện đại (TLS 1.3, ECDSA, chuẩn “sẵn sàng hậu lượng tử”).  
+  - Redirect HTTP → HTTPS ngay tại edge.
 
-- **Business-first approach**: Luôn bắt đầu từ business domain, không phải technology
-- **Ubiquitous language**: Importance của common vocabulary giữa business và tech teams
-- **Bounded contexts**: Cách identify và manage complexity trong large systems
+- **Mutual TLS (sắp có):** Hỗ trợ xác thực 2 chiều bằng client certificate tại edge.  
+- **Origin cloaking:**
+  - **Origin Access Control (OAC):** Ký request tới S3, Lambda Function URL… bằng credential ngắn hạn, chặn truy cập trực tiếp.  
+  - **Custom origin:** Chỉ cho phép IP CloudFront và yêu cầu secret header.
 
-#### Kiến Trúc Kỹ Thuật
+- **Bảo vệ nội dung:**
+  - Signed URL/cookie ngăn hotlink và copy link chia sẻ bừa bãi.
 
-- **Event storming technique**: Phương pháp thực tế để mô hình hóa quy trình kinh doanh
-- Sử dụng **Event-driven communication** thay vì synchronous calls
-- **Integration patterns**: Hiểu khi nào dùng sync, async, pub/sub, streaming
-- **Compute spectrum**: Criteria chọn từ VM → containers → serverless
+- **Caching & tính sẵn sàng:**
+  - Cache bằng TTL để giảm tải origin.  
+  - Serve stale content khi origin chậm hoặc tạm thời lỗi.  
+  - Origin failover sang origin dự phòng.  
+  - Trang lỗi custom và cache error hợp lý.
 
-#### Chiến Lược Hiện Đại Hóa
+---
 
-- **Phased approach**: Không rush, phải có roadmap rõ ràng
-- **7Rs framework**: Nhiều con đường khác nhau tùy thuộc vào đặc điểm của mỗi ứng dụng
-- **ROI measurement**: Cost reduction + business agility
+### Tăng hiệu năng với CloudFront
 
-### Ứng Dụng Vào Công Việc
+- **Multi-layer caching:** Dùng edge location, Regional Edge Cache, Origin Shield để gom request và tăng cache hit.  
+- **Tối ưu kết nối:**
+  - Kết nối multiplexed để tải nhiều asset song song.  
+  - Kết nối persist tới origin để tránh bắt tay TCP nhiều lần.  
+- **Hạ tầng mạng AWS:** Traffic giữa edge và origin đi trên backbone của AWS, giảm độ trễ và tránh nghẽn internet công cộng.  
+- **Logic tại edge:**
+  - CloudFront Functions, Lambda@Edge cho redirect, rewrite URL, A/B test, routing theo geo/device.  
+  - Có thể làm rate limit, mock API, health check, xử lý lỗi ngay gần user.
 
-- **Áp dụng DDD** cho project hiện tại: Event storming sessions với business team
-- **Refactor microservices**: Sử dụng bounded contexts để identify service boundaries
-- **Implement event-driven patterns**: Thay thế một số sync calls bằng async messaging
-- **Serverless adoption**: Pilot AWS Lambda cho một số use cases phù hợp
-- **Try Amazon Q Developer**: Integrate vào development workflow để boost productivity
+---
 
-### Trải nghiệm trong event
+### Use case phổ biến của CloudFront
 
-Tham gia workshop **“GenAI-powered App-DB Modernization”** là một trải nghiệm rất bổ ích, giúp tôi có cái nhìn toàn diện về cách hiện đại hóa ứng dụng và cơ sở dữ liệu bằng các phương pháp và công cụ hiện đại. Một số trải nghiệm nổi bật:
+- **Static website & asset:** Hit cache cao, tăng tốc độ và giảm chi phí origin.  
+- **Full website delivery:** Kết hợp performance, security, HA cho cả nội dung tĩnh và động.  
+- **API acceleration:** Tái dùng kết nối lâu dài, cache hợp lý để giảm latency.  
+- **Streaming media:** Phục vụ số lượng lớn người xem với độ trễ thấp và chi phí tốt.  
+- **Large file download:** Tận dụng range request và edge cache cho file lớn.
 
-#### Học hỏi từ các diễn giả có chuyên môn cao
-- Các diễn giả đến từ AWS và các tổ chức công nghệ lớn đã chia sẻ **best practices** trong thiết kế ứng dụng hiện đại.
-- Qua các case study thực tế, tôi hiểu rõ hơn cách áp dụng **Domain-Driven Design (DDD)** và **Event-Driven Architecture** vào các project lớn.
+### Best practice với CloudFront
 
-#### Trải nghiệm kỹ thuật thực tế
-- Tham gia các phiên trình bày về **event storming** giúp tôi hình dung cách **mô hình hóa quy trình kinh doanh** thành các domain events.
-- Học cách **phân tách microservices** và xác định **bounded contexts** để quản lý sự phức tạp của hệ thống lớn.
-- Hiểu rõ trade-offs giữa **synchronous và asynchronous communication** cũng như các pattern tích hợp như **pub/sub, point-to-point, streaming**.
+- Theo dõi end-to-end: user metrics, internet path và backend.  
+- Tối đa hóa caching (chuẩn hóa cache key, cache response động khi an toàn, cache error).  
+- Dùng WAF chặn traffic xấu, rate limit, lọc API.  
+- Đưa logic nhẹ ra edge (CORS, redirect, header/cookie).  
+- Kết hợp Route 53 failover với origin group để tăng độ bền.
 
-#### Ứng dụng công cụ hiện đại
-- Trực tiếp tìm hiểu về **Amazon Q Developer**, công cụ AI hỗ trợ SDLC từ lập kế hoạch đến maintenance.
-- Học cách **tự động hóa code transformation** và pilot serverless với **AWS Lambda**, từ đó nâng cao năng suất phát triển.
+---
 
-#### Kết nối và trao đổi
-- Workshop tạo cơ hội trao đổi trực tiếp với các chuyên gia, đồng nghiệp và team business, giúp **nâng cao ngôn ngữ chung (ubiquitous language)** giữa business và tech.
-- Qua các ví dụ thực tế, tôi nhận ra tầm quan trọng của **business-first approach**, luôn bắt đầu từ nhu cầu kinh doanh thay vì chỉ tập trung vào công nghệ.
+## AWS WAF & Application Protection
 
-#### Bài học rút ra
-- Việc áp dụng DDD và event-driven patterns giúp giảm **coupling**, tăng **scalability** và **resilience** cho hệ thống.
-- Chiến lược hiện đại hóa cần **phased approach** và đo lường **ROI**, không nên vội vàng chuyển đổi toàn bộ hệ thống.
-- Các công cụ AI như Amazon Q Developer có thể **boost productivity** nếu được tích hợp vào workflow phát triển hiện tại.
+### Mối đe dọa và tác động
 
-#### Một số hình ảnh khi tham gia sự kiện
-* Thêm các hình ảnh của các bạn tại đây
-> Tổng thể, sự kiện không chỉ cung cấp kiến thức kỹ thuật mà còn giúp tôi thay đổi cách tư duy về thiết kế ứng dụng, hiện đại hóa hệ thống và phối hợp hiệu quả hơn giữa các team.
+Nhóm threat chính:
+
+- DDoS và cạn kiệt tài nguyên.  
+- Tấn công lỗ hổng ứng dụng (XSS, SQLi, path traversal...).  
+- Bot độc hại, traffic lạm dụng.
+
+Hậu quả: rò rỉ dữ liệu, lộ credential, spam/abuse, downtime, tăng chi phí, mất uy tín.
+
+### Bot traffic tăng mạnh
+
+Lượng bot (bao gồm bot dùng AI, scraper…) tăng rõ rệt, khiến việc phát hiện và chặn phức tạp hơn, cần cơ chế tinh vi hơn (behavioral, fingerprint…).
+
+### Route 53 trong bảo vệ vành đai
+
+- Hệ thống DNS phân tán toàn cầu.  
+- Sẵn sàng cao, chống DDoS tốt.  
+- Thường là điểm vào đầu tiên cùng với CloudFront + WAF.
+
+### Bảo vệ hạ tầng với AWS Shield
+
+**Tại edge:**
+
+- SYN proxy, packet validation.  
+- Lọc và “rửa” tấn công volumetric.  
+- Điều phối routing tránh path không khỏe.
+
+**Tại “border”:**
+
+- Lọc traffic, phát hiện bất thường ở mức resource.  
+- Phát hiện theo health và mitigation nhắm vào resource được bảo vệ.
+
+### Bảo vệ tầng ứng dụng với AWS WAF
+
+- Thường đứng trước CloudFront hoặc ALB.  
+- Phát hiện HTTP flood, pattern xấu, IP đáng ngờ.  
+- Có thêm Bot Control và Fraud Control add-on.
+
+### Shield Advanced incident response
+
+- Phát hành metrics và alarm để kích hoạt quy trình xử lý sự cố.  
+- Truy cập SRT 24/7 để escalation.  
+- Xác định vector tấn công, nguồn chính và gợi ý phương án giảm thiểu.
+
+### Khái niệm cấu hình WAF
+
+- **Rule và Rule Group:** kết hợp managed + custom rule.  
+- **Managed rules:** bộ rule có sẵn (ví dụ OWASP Top 10).  
+- **Custom rules:** tinh chỉnh theo path/header/pattern của ứng dụng.  
+- **COUNT trước, BLOCK sau:** ban đầu chỉ đếm để quan sát, tránh false positive, rồi mới chuyển sang chặn.  
+- **Label:** gắn nhãn cho request để dùng cho logic phức tạp hơn.  
+- **Scope-down:** thu hẹp phạm vi rule để giảm chi phí và tránh match ngoài ý muốn.
+
+### Web ACL / Protection Pack
+
+- Web ACL là cấu hình WAF tổng thể: rule, rule group, default action.  
+- Gắn vào CloudFront, ALB, API Gateway.  
+- Có logging và sampling để xem log và fine-tune.
+
+### WAF rules và DDoS ở tầng ứng dụng
+
+- Rule đọc IP, header, URI, body rồi quyết định Allow/Block/Count hoặc trả về custom response.  
+- Rate-based rule giới hạn request theo IP (hoặc key khác), tự động bóp traffic lạm dụng.  
+- Dùng rule để giảm thiểu HTTP flood ở tầng ứng dụng.
+
+### WAF label & loại bot
+
+- **Labels:** do managed/custom rule thêm, đánh dấu geo, IP reputation, bot/fraud category, match…  
+- **Common bots:** bot tự khai báo (search engine, social, library), có thể nhận diện qua header, TLS fingerprint, IP reputation.  
+- **Evasive bots:** scraper, tool login/brute force, scanner… cố bắt chước người dùng thực; cần client interrogation, phân tích hành vi theo session.
+
+---
+
+## Lab CloudFront: Perimeter Protection
+
+### So sánh S3 static origin vs S3 sau CloudFront
+
+Trong lab, so sánh direct S3 website và S3 sau CloudFront:
+
+- CloudFront phục vụ nội dung cache nhanh hơn nhiều.  
+- Edge location + backbone AWS cho latency tốt hơn đường internet công cộng.  
+- Nén ở edge giúp giảm kích thước, tăng tốc thêm một bước.
+
+---
+
+## Lab AWS WAF: “Strengthen Your Web Application Defenses”
+
+Trong lab WAF, nhóm cấu hình và kiểm thử rule để chặn:
+
+- XSS.  
+- SQL Injection.  
+- Path traversal.  
+- Mẫu abuse server-side.  
+- Bot phổ thông và bot “lẩn tránh”.  
+- API misuse.  
+- Một bài test “bí ẩn” dùng header mã hóa, đòi hỏi rule custom để chặn.
+
+---
+
+### Trải nghiệm sự kiện
+
+Workshop diễn ra rất đúng thời điểm với nhóm, vì ngay tối hôm trước bọn mình vừa bắt đầu cấu hình CloudFront. Mô hình flat-rate bao gồm WAF đặc biệt phù hợp với bài toán hiện tại vì giúp đơn giản hóa cả ước tính chi phí lẫn cấu hình bảo mật.
+
+Các phần lab khá vui và thực tế, và anh Julian hỗ trợ cực kỳ nhiệt tình, thường xuyên đi vòng để xem và giúp debug khi có lỗi cấu hình. Sau workshop, nhóm cũng tranh thủ hỏi thêm:
+
+- **Hỏi:** WAF có thể chặn bot, nhưng với AI agent kiểu Gemini dùng trình duyệt thật (browser integration) thì sao?  
+  **Trả lời:** Dù là Gemini hay agent khác, traffic cuối cùng vẫn là HTTP/API và thường có thể nhận diện/chặn ở tầng request. Một số agent (ví dụ vài công cụ assist dựa trên Claude) giống hệt người dùng thật và không nhất thiết gây hại, nên không phải lúc nào cũng cần chặn gắt.
+
+Sự kiện kết thúc với phần chụp ảnh kỷ niệm và quiz Kahoot; việc nhìn thấy dashboard WAF báo “chặn hết các threat trong lab” tạo cảm giác khá “đã”, giống như thấy cả pipeline bảo vệ hoạt động trơn tru từ đầu đến cuối.
+
+#### Một vài hình ảnh sự kiện
+
+![Attendee](/images/4-Event/Event5AttendeePic.jpg)  
+_Hình chụp nhóm tham dự workshop_
+
+![Full Threat Blocked](/images/4-Event/FullThreatBlockedWAFWorkshop.jpg)  
+_Hoàn thành chặn toàn bộ kịch bản tấn công trong phần lab WAF_

@@ -5,12 +5,6 @@ weight: 7
 chapter: false
 pre: " <b> 7. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
-
->Tại đây bạn có thể tự do đóng góp ý kiến cá nhân về những trải nghiệm khi tham gia chương trình First Cloud Journey, giúp team FCJ cải thiện những vấn đề còn thiếu sót dựa trên các hạng mục sau:
-
 ### Đánh giá chung
 
 **1. Môi trường làm việc**  
@@ -39,6 +33,7 @@ Công ty có hỗ trợ phụ cấp thực tập và tạo điều kiện về t
 
 
 ### Đề xuất & mong muốn
-- Bạn có đề xuất gì để cải thiện trải nghiệm trong kỳ thực tập?  
-- Bạn có muốn tiếp tục chương trình này trong tương lai?
-- Góp ý khác (tự do chia sẻ):
+
+- Mong công ty bố trí thêm khu vực uống nước (máy lọc nước hoặc nước uống dùng chung) để mọi người dễ dàng sử dụng trong giờ làm việc, đặc biệt là những ngày làm việc dài hoặc có workshop.  
+- Nên tổ chức các sự kiện trong chuỗi AWS Cloud Mastery (hoặc các buổi định hướng tương tự) sớm hơn trong kỳ thực tập, để thực tập sinh có cái nhìn tổng quan tốt hơn và định hình project ngay từ đầu.  
+- Trong tương lai, mình rất mong có cơ hội tiếp tục tham gia hoặc hỗ trợ các khóa FCJ tiếp theo, cũng như được đóng góp thêm vào các hoạt động cộng đồng của chương trình.

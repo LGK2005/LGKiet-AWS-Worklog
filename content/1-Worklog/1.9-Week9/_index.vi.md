@@ -1,59 +1,30 @@
 ---
-title: "Worklog Tuần 9"
+title: "Nhật ký tuần 9"
 date: "2025-09-09"
-weight: 1
+weight: 09
 chapter: false
 pre: " <b> 1.9. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+### Mục tiêu tuần 9
 
-### Mục tiêu tuần 9:
+* Hỗ trợ bạn bè làm project game với scene 3D và video cho màn hình main menu.
+* Học cách phân tích chi phí và mức sử dụng bằng AWS Glue và Amazon Athena.
+* Bắt đầu thiết kế dashboard cho workshop.
 
-* Kết nối, làm quen với các thành viên trong First Cloud Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Công việc thực hiện trong tuần
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --------- | ------------ | ---------------- | ------------------- |
+| Hai | Đám tang trong gia đình. <br> Dành trọn ngày cho gia đình và các công việc liên quan, không học hay làm project. | 03/11/2025 | 03/11/2025 | – |
+| Ba | Hỗ trợ nhóm bạn đang thực tập ở công ty khác với project game (màn hình main menu): <br> &emsp; + Thiết kế và dựng khung (blockout) scene 3D cho main menu của game. <br> &emsp; + Thiết lập góc camera và ánh sáng cơ bản phù hợp cho background main menu. <br> &emsp; + Chỉnh sửa bố cục để phù hợp với phong cách hình ảnh chung của game. | 04/11/2025 | 04/11/2025 | – |
+| Tư | Tiếp tục hoàn thiện scene và video cho main menu: <br> &emsp; + Tinh chỉnh chi tiết trong scene 3D (môi trường, vật thể, ánh sáng). <br> &emsp; + Ghi hình và xuất video sequence của scene để dùng làm background cho màn hình menu. <br> &emsp; + Gửi bộ asset và video hoàn chỉnh cho team game sử dụng. | 05/11/2025 | 05/11/2025 | [3D & video outputs](https://drive.google.com/drive/folders/1JRkPVjRwadkkaCVmrocGrRtzzi2xl0MP?usp=sharing) |
+| Năm | Học lab phân tích chi phí với AWS Glue & Athena: <br> &emsp; + Xem lại flow workshop phân tích báo cáo chi phí và usage bằng Glue và Athena. <br> &emsp; + Tìm hiểu cách Glue Crawler tạo bảng từ dữ liệu cost & usage trong S3. <br> &emsp; + Ôn lại cách dùng Athena query để phân tích chi phí và hiệu năng theo dịch vụ. | 06/11/2025 | 06/11/2025 | [AWS Glue & Athena – Cost and Usage Analysis](https://000040.awsstudygroup.com/vi/) |
+| Sáu | Thiết kế phiên bản đầu tiên của dashboard custom trên Figma: <br> &emsp; + Phác thảo layout hiển thị GuardDuty findings, xu hướng chi phí và trạng thái IR workflow. <br> &emsp; + Chọn bảng màu và typography theo phong cách AWS/cloud. <br> &emsp; + Tạo wireframe và một số màn hình hi-fi ban đầu để sau này triển khai thành dashboard host trên S3. | 07/11/2025 | 07/11/2025 | – |
 
+### Kết quả đạt được trong tuần 9
 
-### Kết quả đạt được tuần 9:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+* Dù tuần khó khăn vì đám tang, vẫn cố gắng sắp xếp thời gian để hỗ trợ bạn bè trong project game.
+* Hoàn thiện scene 3D và video background cho main menu game, bàn giao asset sử dụng được cho nhóm bạn thực tập.
+* Nắm được khái niệm và quy trình cơ bản dùng AWS Glue và Amazon Athena để phân tích chi phí và mức sử dụng dịch vụ.
+* Thiết kế được bản phác thảo đầu tiên của dashboard trên Figma, đặt nền tảng UI/UX cho dashboard của workshop.

@@ -1,59 +1,30 @@
 ---
-title: "Worklog Tuần 2"
-date: "2025-09-09"
-weight: 1
+title: "Nhật ký tuần 2"
+date: "2025-09-15"
+weight: 2
 chapter: false
 pre: " <b> 1.2. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+### Mục tiêu tuần 2
 
-### Mục tiêu tuần 2:
+- Nghỉ ngơi và hồi phục sau phẫu thuật áp-xe nhẹ.
+- Tuân thủ hướng dẫn của bác sĩ, tránh hoạt động nặng.
+- Thay băng vết thương hằng ngày theo chỉ định.
 
-* Kết nối, làm quen với các thành viên trong First Cloud Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Công việc thực hiện trong tuần
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Thứ      | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| -------- | --------- | ------------ | ---------------- | ------------------- |
+| Hai      | Nghỉ ngơi tại nhà sau phẫu thuật; uống thuốc giảm đau đúng giờ; đi tái khám kiểm tra vết thương lần đầu. | 15/09/2025 | 15/09/2025 | – |
+| Ba       | Thay băng vết thương hằng ngày theo hướng dẫn của bác sĩ; hạn chế ngồi lâu. | 16/09/2025 | 16/09/2025 | – |
+| Tư       | Thay băng; chỉ đi lại nhẹ nhàng; theo dõi cảm giác đau và tình trạng vết thương. | 17/09/2025 | 17/09/2025 | – |
+| Năm      | Thay băng; giữ vùng vết thương luôn sạch và khô. | 18/09/2025 | 18/09/2025 | – |
+| Sáu      | Thay băng hằng ngày; tập trung nghỉ ngơi và ăn uống đầy đủ để hồi phục. | 19/09/2025 | 19/09/2025 | – |
 
+### Kết quả đạt được trong tuần 2
 
-### Kết quả đạt được tuần 2:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+* Tuân thủ đúng phác đồ chăm sóc sau phẫu thuật, bao gồm thay băng hằng ngày và nghỉ ngơi theo lời dặn của bác sĩ.
+* Không tham gia học tập hay làm project để giảm rủi ro biến chứng và giúp vết thương lành tốt hơn.
+* Ghi lại ngắn gọn quá trình hồi phục để giữ cho worklog tuần tự và đầy đủ.
+* Sẵn sàng cả về thể chất lẫn tinh thần để quay lại học AWS và làm project vào tuần 3.

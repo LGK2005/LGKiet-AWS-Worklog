@@ -1,125 +1,221 @@
 ---
-title: "Event 2"
-date: "2000-01-01"
-weight: 1
+title: "Event 3"
+date: "2025-11-17"
+weight: 3
 chapter: false
-pre: " <b> 4.2. </b> "
+pre: " <b> 4.3. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
+# Báo cáo sự kiện: “AWS Cloud Mastery Series #2 – DevOps on AWS”
 
-# Bài thu hoạch “GenAI-powered App-DB Modernization workshop”
+### Mục tiêu sự kiện
 
-### Mục Đích Của Sự Kiện
+- Giới thiệu các dịch vụ DevOps cốt lõi trên AWS và các pipeline CI/CD.
+- Giải thích khái niệm Infrastructure as Code (IaC) và các công cụ phổ biến.
+- Trình bày các lựa chọn container hóa trên AWS.
+- Minh họa cách giám sát và quan sát hệ thống (monitoring & observability) bằng dịch vụ AWS.
 
-- Chia sẻ best practices trong thiết kế ứng dụng hiện đại
-- Giới thiệu phương pháp DDD và event-driven architecture
-- Hướng dẫn lựa chọn compute services phù hợp
-- Giới thiệu công cụ AI hỗ trợ development lifecycle
+### Diễn giả
 
-### Danh Sách Diễn Giả
+- **Truong Quang Tinh** – AWS Community Builder, Platform Engineer – TymeX  
+- **Bao Huynh** – AWS Community Builder  
+- **Nguyen Khanh Phuc Thinh** – AWS Community Builder  
+- **Tran Dai Vi** – AWS Community Builder  
+- **Huynh Hoang Long** – AWS Community Builder  
+- **Pham Hoang Quy** – AWS Community Builder  
+- **Nghiem Le** – AWS Community Builder  
+- **Dinh Le Hoang Anh** – Cloud Engineer Trainee, First Cloud AI Journey  
 
-- **Jignesh Shah** - Director, Open Source Databases
-- **Erica Liu** - Sr. GTM Specialist, AppMod
-- **Fabrianne Effendi** - Assc. Specialist SA, Serverless Amazon Web Services
+---
 
-### Nội Dung Nổi Bật
+## DevOps Mindset
 
-#### Đưa ra các ảnh hưởng tiêu cực của kiến trúc ứng dụng cũ
+**– Văn hóa (Culture):**  
+Nhấn mạnh hợp tác giữa các team, tự động hóa cao, học tập liên tục và ra quyết định dựa trên số liệu đo được.
 
-- Thời gian release sản phẩm lâu → Mất doanh thu/bỏ lỡ cơ hội
-- Hoạt động kém hiệu quả → Mất năng suất, tốn kém chi phí
-- Không tuân thủ các quy định về bảo mật → Mất an ninh, uy tín
+**– Vai trò DevOps:**  
+Các vai trò thường gặp trong tổ chức DevOps hiện đại gồm: DevOps Engineer, Cloud Engineer, Platform Engineer, Site Reliability Engineer (SRE)… tập trung vào độ tin cậy, tốc độ triển khai và vận hành hiệu quả.
 
-#### Chuyển đổi sang kiến trúc ứng dụng mới - Microservice Architecture
+**– Chỉ số thành công:**
 
-Chuyển đổi thành hệ thống modular – từng chức năng là một **dịch vụ độc lập** giao tiếp với nhau qua **sự kiện** với 3 trụ cột cốt lõi:
+- Triển khai ổn định, ít lỗi.  
+- Tăng tốc độ deliver, giảm lead time cho mỗi thay đổi.  
+- Hệ thống ổn định, chịu lỗi tốt.  
+- Trải nghiệm người dùng cuối mượt hơn.  
+- Chứng minh được giá trị kinh doanh từ đầu tư công nghệ.
 
-- **Queue Management**: Xử lý tác vụ bất đồng bộ
-- **Caching Strategy:** Tối ưu performance
-- **Message Handling:** Giao tiếp linh hoạt giữa services
+| NÊN (DO)                       | KHÔNG NÊN (DON'T)                 |
+| :---------------------------- | :---------------------------------|
+| Bắt đầu từ nền tảng cơ bản    | Mắc kẹt mãi trong “tutorial hell” |
+| Học bằng cách tự xây project  | Copy-paste mù quáng               |
+| Ghi chép/tài liệu hóa đầy đủ  | So sánh bản thân với người khác   |
+| Làm chủ từng thứ một          | Bỏ cuộc sau vài lần thất bại      |
+| Rèn luyện kỹ năng mềm         |                                   |
 
-#### Domain-Driven Design (DDD)
+**– Continuous Integration (CI):**  
+Dev liên tục merge code vào nhánh chung (main), với build + test tự động để mỗi commit luôn ở trạng thái có thể release, tạo tiền đề cho Continuous Delivery/Deployment.
 
-- **Phương pháp 4 bước**: Xác định domain events → sắp xếp timeline → identify actors → xác định bounded contexts
-- **Case study bookstore**: Minh họa cách áp dụng DDD thực tế
-- **Context mapping**: 7 patterns tích hợp bounded contexts
+---
 
-#### Event-Driven Architecture
+## Infrastructure as Code (IaC)
 
-- **3 patterns tích hợp**: Publish/Subscribe, Point-to-point, Streaming
-- **Lợi ích**: Loose coupling, scalability, resilience
-- **So sánh sync vs async**: Hiểu rõ trade-offs (sự đánh đổi)
+**– Lợi ích:**  
+IaC giúp tự động hóa, lặp lại được và dễ scale khi quản lý hạ tầng. Hạ tầng có thể version-control, tạo/xóa môi trường theo nhu cầu, và các thay đổi được review như code thay vì thao tác ClickOps thủ công.
 
-#### Compute Evolution
+### AWS CloudFormation
 
-- **Shared Responsibility Model**: Từ EC2 → ECS → Fargate → Lambda
-- **Serverless benefits**: No server management, auto-scaling, pay-for-value
-- **Functions vs Containers**: Criteria lựa chọn phù hợp
+Dịch vụ IaC “chính chủ” của AWS, dùng file JSON/YAML để mô tả và tạo toàn bộ stack tài nguyên AWS một cách dự đoán được và dễ audit.
 
-#### Amazon Q Developer
+**– Stack:**  
+Stack là tập hợp tài nguyên AWS được định nghĩa trong một template. Các thao tác create, update, delete đều thực hiện ở cấp độ stack, giúp quản lý môi trường phức tạp dễ hơn.
 
-- **SDLC automation**: Từ planning đến maintenance
-- **Code transformation**: Java upgrade, .NET modernization
-- **AWS Transform agents**: VMware, Mainframe, .NET migration
+**– CloudFormation Template:**  
+File khai báo (YAML/JSON) mô tả tài nguyên, cấu hình và quan hệ giữa chúng, đóng vai trò “bản vẽ” có thể tái sử dụng cho các môi trường dev/test/prod.
 
-### Những Gì Học Được
+**– Cách hoạt động (tổng quan):**
 
-#### Tư Duy Thiết Kế
+1. Viết template mô tả hạ tầng mong muốn.  
+2. Lưu local hoặc trên S3, tạo stack từ template đó.  
+3. CloudFormation tự tạo/cập nhật/xóa tài nguyên để khớp với template.
 
-- **Business-first approach**: Luôn bắt đầu từ business domain, không phải technology
-- **Ubiquitous language**: Importance của common vocabulary giữa business và tech teams
-- **Bounded contexts**: Cách identify và manage complexity trong large systems
+**– Drift Detection:**  
+Cho phép phát hiện tài nguyên bị chỉnh sửa ngoài IaC. Từ đó team có thể đồng bộ lại template với trạng thái thực tế hoặc rollback những thay đổi trái phép.
 
-#### Kiến Trúc Kỹ Thuật
+### AWS Cloud Development Kit (CDK)
 
-- **Event storming technique**: Phương pháp thực tế để mô hình hóa quy trình kinh doanh
-- Sử dụng **Event-driven communication** thay vì synchronous calls
-- **Integration patterns**: Hiểu khi nào dùng sync, async, pub/sub, streaming
-- **Compute spectrum**: Criteria chọn từ VM → containers → serverless
+Framework open-source cho phép định nghĩa CloudFormation stack bằng ngôn ngữ lập trình thực (TypeScript/JavaScript, Python, Java, C#/.NET, Go).
 
-#### Chiến Lược Hiện Đại Hóa
+**– Construct:**  
+Construct là “viên gạch” trong CDK, đại diện cho một hoặc nhiều tài nguyên kèm cấu hình. Có 3 cấp:
 
-- **Phased approach**: Không rush, phải có roadmap rõ ràng
-- **7Rs framework**: Nhiều con đường khác nhau tùy thuộc vào đặc điểm của mỗi ứng dụng
-- **ROI measurement**: Cost reduction + business agility
+- **L1:** Low-level, map 1:1 với resource CloudFormation, kiểm soát chi tiết nhất.  
+- **L2:** API cấp cao, đóng gói best practice và default hợp lý.  
+- **L3:** Pattern sẵn (opinionated), ghép nhiều resource thành kiến trúc hoàn chỉnh (ví dụ: API Gateway + Lambda + DynamoDB).
 
-### Ứng Dụng Vào Công Việc
+### AWS Amplify
 
-- **Áp dụng DDD** cho project hiện tại: Event storming sessions với business team
-- **Refactor microservices**: Sử dụng bounded contexts để identify service boundaries
-- **Implement event-driven patterns**: Thay thế một số sync calls bằng async messaging
-- **Serverless adoption**: Pilot AWS Lambda cho một số use cases phù hợp
-- **Try Amazon Q Developer**: Integrate vào development workflow để boost productivity
+Nền tảng tập trung vào build và deploy web/mobile app. Amplify dùng CloudFormation phía sau để dựng backend và hosting, nhưng cung cấp trải nghiệm thân thiện hơn qua CLI và console.
 
-### Trải nghiệm trong event
+### Terraform
 
-Tham gia workshop **“GenAI-powered App-DB Modernization”** là một trải nghiệm rất bổ ích, giúp tôi có cái nhìn toàn diện về cách hiện đại hóa ứng dụng và cơ sở dữ liệu bằng các phương pháp và công cụ hiện đại. Một số trải nghiệm nổi bật:
+Công cụ IaC đa cloud (AWS, Azure, GCP…) dùng HCL (HashiCorp Configuration Language).
 
-#### Học hỏi từ các diễn giả có chuyên môn cao
-- Các diễn giả đến từ AWS và các tổ chức công nghệ lớn đã chia sẻ **best practices** trong thiết kế ứng dụng hiện đại.
-- Qua các case study thực tế, tôi hiểu rõ hơn cách áp dụng **Domain-Driven Design (DDD)** và **Event-Driven Architecture** vào các project lớn.
+**– Thế mạnh:**
 
-#### Trải nghiệm kỹ thuật thực tế
-- Tham gia các phiên trình bày về **event storming** giúp tôi hình dung cách **mô hình hóa quy trình kinh doanh** thành các domain events.
-- Học cách **phân tách microservices** và xác định **bounded contexts** để quản lý sự phức tạp của hệ thống lớn.
-- Hiểu rõ trade-offs giữa **synchronous và asynchronous communication** cũng như các pattern tích hợp như **pub/sub, point-to-point, streaming**.
+- Hỗ trợ multi-cloud với ngôn ngữ và quy trình thống nhất.  
+- Có “state” để nắm rõ chênh lệch giữa trạng thái hiện tại và định nghĩa trong code.
 
-#### Ứng dụng công cụ hiện đại
-- Trực tiếp tìm hiểu về **Amazon Q Developer**, công cụ AI hỗ trợ SDLC từ lập kế hoạch đến maintenance.
-- Học cách **tự động hóa code transformation** và pilot serverless với **AWS Lambda**, từ đó nâng cao năng suất phát triển.
+### Cách chọn công cụ IaC?
 
-#### Kết nối và trao đổi
-- Workshop tạo cơ hội trao đổi trực tiếp với các chuyên gia, đồng nghiệp và team business, giúp **nâng cao ngôn ngữ chung (ubiquitous language)** giữa business và tech.
-- Qua các ví dụ thực tế, tôi nhận ra tầm quan trọng của **business-first approach**, luôn bắt đầu từ nhu cầu kinh doanh thay vì chỉ tập trung vào công nghệ.
+**– Cần cân nhắc:**
 
-#### Bài học rút ra
-- Việc áp dụng DDD và event-driven patterns giúp giảm **coupling**, tăng **scalability** và **resilience** cho hệ thống.
-- Chiến lược hiện đại hóa cần **phased approach** và đo lường **ROI**, không nên vội vàng chuyển đổi toàn bộ hệ thống.
-- Các công cụ AI như Amazon Q Developer có thể **boost productivity** nếu được tích hợp vào workflow phát triển hiện tại.
+- Hạ tầng xài 1 cloud (AWS-only) hay đa cloud?  
+- Vai trò của bạn thiên về dev ứng dụng hay platform/ops?  
+- Ecosystem (doc, ví dụ, module chính thức, support) quanh công cụ đó trên cloud bạn dùng.
 
-#### Một số hình ảnh khi tham gia sự kiện
-* Thêm các hình ảnh của các bạn tại đây
-> Tổng thể, sự kiện không chỉ cung cấp kiến thức kỹ thuật mà còn giúp tôi thay đổi cách tư duy về thiết kế ứng dụng, hiện đại hóa hệ thống và phối hợp hiệu quả hơn giữa các team.
+---
+
+## Dịch vụ Container trên AWS
+
+### Dockerfile
+
+Dockerfile mô tả cách build image: base image, dependency, step build, env, entrypoint… giúp app chạy nhất quán giữa các môi trường.
+
+**– Image:**  
+Image là blueprint bất biến, build từ Dockerfile theo kiểu layered. Container chạy từ image đó ở dev/stage/prod.
+
+**– Workflow:**  
+Viết Dockerfile → build image → chạy container local hoặc trên AWS → push image lên registry (ECR/Docker Hub).
+
+### Amazon ECR
+
+Registry container private, được quản lý toàn phần trên AWS.
+
+**– Tính năng chính:**
+
+- Quét image tìm lỗ hổng bảo mật.  
+- Immutable tag tránh overwrite nhầm.  
+- Lifecycle policy dọn image cũ.  
+- Mã hóa & tích hợp IAM để kiểm soát truy cập.
+
+### Container Orchestration
+
+Orchestrator quản lý scheduling, scaling, lifecycle container:
+
+- Restart container lỗi.  
+- Scale in/out theo traffic/metrics.  
+- Cân bằng tải và phân bố workload hiệu quả.
+
+### Kubernetes (K8s)
+
+Nền tảng orchestrator mã nguồn mở, tự động deploy, scale và self-heal ứng dụng container.
+
+**– Thành phần chính:**
+
+- **Control Plane (Master):** quản lý trạng thái cluster, scheduling, API.  
+- **Worker Node:** chạy workload trong các pod.  
+- **Pod:** đơn vị deploy nhỏ nhất, thường chứa 1–vài container gắn chặt với nhau.  
+- **Service:** endpoint ổn định + load balancing cho nhóm pod.
+
+### ECS vs EKS
+
+| Tiêu chí                  | Amazon ECS                                           | Amazon EKS                                                  |
+| :------------------------ | :--------------------------------------------------- | :---------------------------------------------------------- |
+| **Công nghệ lõi**         | Orchestrator container “nhà trồng” trên AWS         | Kubernetes được AWS quản lý (chuẩn open-source)            |
+| **Độ phức tạp**           | Đơn giản, dễ vận hành                                | Linh hoạt hơn nhưng phức tạp hơn                           |
+| **Kiến thức yêu cầu**     | Không cần biết Kubernetes                            | Cần nắm khái niệm K8s (pod, deployment, service, …)        |
+| **Tích hợp với AWS**      | Tích hợp sâu với dịch vụ AWS                         | Tích hợp theo chuẩn K8s, dễ dùng thêm tool từ ecosystem    |
+| **Use case / Lợi ích**    | Deploy nhanh, ít gánh nặng vận hành                  | Phù hợp khi cần tính năng K8s, multi-cluster, portability  |
+| **Ecosystem / Community** | Tool & cộng đồng xoay quanh ECS                     | Cộng đồng và hệ sinh thái Kubernetes rất lớn               |
+| **Tóm tắt**               | Phù hợp khi muốn nền tảng container AWS-managed     | Phù hợp khi cần full power của Kubernetes                  |
+
+### App Runner
+
+Dịch vụ fully-managed để deploy nhanh web app/API chạy container từ source hoặc registry, phù hợp team nhỏ hoặc workload muốn “ít đụng vào hạ tầng” nhất.
+
+---
+
+## Monitoring & Observability
+
+### CloudWatch
+
+- Dịch vụ trung tâm để giám sát tài nguyên và ứng dụng AWS gần real-time.  
+- Cung cấp metrics, logs, alarm, dashboard để cải thiện độ tin cậy và nhìn rõ chi phí.  
+- Tích hợp với Auto Scaling, EventBridge… để tự động phản ứng theo sự kiện.
+
+**– CloudWatch Metrics:**  
+Lưu lại số liệu hiệu năng/trạng thái từ dịch vụ AWS và workload on-prem (thông qua agent), có thể dùng làm trigger cho alarm, scaling policy, DevOps workflow.
+
+### AWS X-Ray
+
+**– Distributed Tracing:**  
+X-Ray trace request đi qua nhiều microservice, vẽ sơ đồ call graph và độ trễ, giúp tìm ra bottleneck hoặc điểm lỗi trong kiến trúc phức tạp.
+
+**– Performance Insight:**  
+Hỗ trợ phân tích nguyên nhân gốc rễ của lỗi và vấn đề hiệu năng, cho thấy request tốn thời gian ở đâu, lỗi xảy ra tại service nào.
+
+---
+
+### Trải nghiệm sự kiện
+
+Sự kiện này đặc biệt hữu ích cho project hiện tại vì trùng với định hướng của nhóm: chuyển từ ClickOps sang IaC với AWS CDK, giúp hạ tầng dễ bảo trì, tái sử dụng và làm việc nhóm tốt hơn. Phần CloudWatch và X-Ray cũng hỗ trợ cho yêu cầu monitoring và quan sát dữ liệu mà nhóm đang cần.
+
+Các diễn giả cũng giải đáp một số câu hỏi của team:
+
+- **Hỏi:** Project hiện tại đang dựng bằng ClickOps, muốn chuyển sang CDK thì có tool nào scan hạ tầng hiện tại và tự sinh CDK/CloudFormation không?  
+  **Trả lời:** Hiện chưa có công cụ nào làm việc này một cách đáng tin cậy cho toàn bộ môi trường. Cách tốt nhất là dựng lại hạ tầng bằng IaC và dần dần đồng bộ môi trường thực với code.
+
+- **Hỏi:** X-Ray nhìn khá giống CloudTrail, khác nhau chỗ nào?  
+  **Trả lời:** X-Ray tập trung vào trace request ứng dụng và call giữa service để phân tích hiệu năng và debug. CloudTrail thì chuyên về audit API call và hoạt động của user/role trong tài khoản AWS.
+
+- **Hỏi:** Project nhóm đang dựng quanh GuardDuty findings, có gợi ý nào để mô phỏng finding ổn định cho demo không?  
+  **Trả lời:** Có thể dùng port scanning để tạo finding, hoặc cấu hình thêm custom threat list (IP/domain độc hại) để tạo cảnh báo khi có hoạt động liên quan.
+
+Đây cũng là lần đầu một số diễn giả trình bày các chủ đề này:
+
+- Phần DevOps và IaC được trình bày rõ ràng, mạch lạc và dễ theo dõi.  
+- Phần Monitoring & Observability tuy có chút hồi hộp nhưng vẫn mang lại nhiều thông tin thực tế và áp dụng được.
+
+#### Một vài hình ảnh sự kiện
+
+![Group picture during the event taken by speaker Tran Dai Vi](/images/4-Event/CM2GroupPic.jpg)

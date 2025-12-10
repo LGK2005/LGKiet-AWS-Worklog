@@ -5,9 +5,6 @@ weight: 7
 chapter: false
 pre: " <b> 7. </b> "
 ---
-
-> Here, you can freely share your personal opinions about your experience participating in the First Cloud Journey program. This will help the FCJ team improve any shortcomings based on the following aspects:
-
 ### Overall Evaluation
 
 **1. Working Environment**  
@@ -38,6 +35,8 @@ The company provides an internship allowance and offers flexible working hours w
 ---
 
 ### Suggestions & Expectations
-- Do you have any suggestions to improve the internship experience?  
-- Would you like to continue this program in the future?  
-- Any other comments (free sharing):
+
+- It would be great if the company could arrange an additional water corner (for example, a shared water dispenser or filtered water area) so that everyone can easily grab a drink during work, especially on long days or workshop days.  
+- It would be helpful if the AWS Cloud Mastery series (or similar orientation sessions) could be scheduled earlier in the internship, so interns can gain a clearer big-picture view and shape their projects from the beginning.  
+- In the future, I would be very happy to have the chance to continue participating in or supporting the next FCJ cohorts, as well as contributing more to the program’s community activities.
+

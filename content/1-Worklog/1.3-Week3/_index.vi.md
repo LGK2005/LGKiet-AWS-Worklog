@@ -1,59 +1,31 @@
 ---
-title: "Worklog Tuần 3"
-date: "2025-09-09"
-weight: 1
+title: "Nhật ký tuần 3"
+date: "2025-09-22"
+weight: 03
 chapter: false
 pre: " <b> 1.3. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+### Mục tiêu tuần 3
 
-### Mục tiêu tuần 3:
+* Tiếp tục hồi phục sức khỏe nhưng vẫn cố gắng duy trì tiến độ học khi có thể.
+* Bắt đầu tìm hiểu Amazon S3 và cách host website tĩnh.
+* Ôn lại IAM, Organizations và các best practices về bảo mật khi tình trạng ổn hơn.
+* Trao đổi ý tưởng project với các bạn trong nhóm khi có thời gian và sức.
 
-* Kết nối, làm quen với các thành viên trong First Cloud Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Công việc thực hiện trong tuần
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --------- | ------------ | ---------------- | ------------------- |
+| Hai | Vẫn đang trong giai đoạn hồi phục sau phẫu thuật. <br> Đi bệnh viện rửa vết thương và thay băng. <br> Chủ yếu nghỉ ngơi tại nhà, chưa thể ngồi hoặc dùng máy tính lâu, không làm bài lab hay học gì thêm. | 22/09/2025 | 22/09/2025 | – |
+| Ba | Tiếp tục đi bệnh viện thay băng và kiểm tra vết thương. <br> Mức độ đau vẫn còn cao, phần lớn thời gian phải nằm nghỉ. <br> Chỉ xem lướt ghi chú trên điện thoại, chưa làm lab thực hành. | 23/09/2025 | 23/09/2025 | – |
+| Tư | Ngày cuối của lịch thay băng dày đặc tại bệnh viện. <br> Bác sĩ cho phép bắt đầu ngồi dậy trong thời gian ngắn, nhưng vẫn chưa đủ sức để tập trung học lâu. <br> Dành thời gian suy nghĩ về phần S3 sẽ học và một vài ý tưởng cho project, nhưng chưa làm lab thực tế. | 24/09/2025 | 24/09/2025 | – |
+| Năm | Sức khỏe khá hơn, có thể ngồi bàn học trong thời gian ngắn, vẫn phải đi thay băng hằng ngày nhưng bắt đầu học lại. <br> Bắt đầu “Khởi đầu với Amazon S3”: <br> &emsp; + Tìm hiểu khái niệm cơ bản về Amazon S3, cách lưu trữ dạng object, độ bền dữ liệu và các use case phổ biến. <br> &emsp; + Xem lại các yêu cầu trước khi làm việc với S3 và tạo một S3 bucket cho lab. <br> &emsp; + Bật chế độ static website hosting cho S3 bucket và upload các file website ban đầu. <br> &emsp; + Cấu hình Block Public Access để mở public có kiểm soát cho website. | 25/09/2025 | 25/09/2025 | [Giới thiệu Amazon S3](https://000057.awsstudygroup.com/vi/1-introduce/) <br><br> [Chuẩn bị](https://000057.awsstudygroup.com/vi/2-prerequiste/) <br><br> [Bật Static Website](https://000057.awsstudygroup.com/vi/3-staticwebsite/) <br><br> [Cấu hình Block Public Access](https://000057.awsstudygroup.com/vi/4-blockpublicaccess/) |
+| Sáu | Vẫn phải thay băng mỗi ngày nhưng đã ngồi được lâu hơn, tiếp tục làm lab về S3. <br> Tiếp tục “Khởi đầu với Amazon S3”: <br> &emsp; + Cấu hình quyền public ở mức object để website có thể phục vụ nội dung. <br> &emsp; + Test truy cập website tĩnh trên trình duyệt để kiểm tra cấu hình. <br> &emsp; + Tìm hiểu lý thuyết về tăng tốc website tĩnh với CloudFront (chưa triển khai đầy đủ do sức khỏe/thời gian). <br> &emsp; + Thực hành Bucket Versioning, di chuyển object giữa thư mục/bucket và replicate object sang region khác. <br> &emsp; + Ôn lại các bước dọn dẹp tài nguyên và best practices về bảo mật, chi phí với S3. | 26/09/2025 | 26/09/2025 | [Cấu hình Public Object](https://000057.awsstudygroup.com/vi/5-publicobject/) <br><br> [Kiểm tra Website](https://000057.awsstudygroup.com/vi/6-testwebsite/) <br><br> [Tăng tốc với CloudFront](https://000057.awsstudygroup.com/vi/7-cloudfront/) <br><br> [Bucket Versioning](https://000057.awsstudygroup.com/vi/8-versioning/) <br><br> [Di chuyển & sao chép Object](https://000057.awsstudygroup.com/vi/9-moveobject/) <br><br> [S3 Cross-Region Replication](https://000057.awsstudygroup.com/vi/10-s3ccr/) <br><br> [Cleanup & Best Practices](https://000057.awsstudygroup.com/vi/11-cleanup/) |
 
+### Kết quả đạt được trong tuần 3
 
-### Kết quả đạt được tuần 3:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+* Cân bằng khá tốt giữa việc hồi phục sức khỏe và học tập bằng cách bắt đầu học lại từ từ từ thứ Năm trở đi.
+* Nắm được nền tảng về Amazon S3, bao gồm bucket, object, static website hosting và cách quản lý quyền truy cập public.
+* Triển khai thành công một website tĩnh đơn giản trên S3, kiểm tra truy cập và tìm hiểu thêm về việc tăng tốc với CloudFront.
+* Thực hành các tính năng như Bucket Versioning, di chuyển object, replicate cross-region và dọn dẹp tài nguyên theo đúng best practices.

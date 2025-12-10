@@ -1,58 +1,29 @@
 ---
-title: "Worklog Tuần 6"
+title: "Nhật ký tuần 6"
 date: "2025-09-09"
-weight: 1
+weight: 06
 chapter: false
 pre: " <b> 1.6. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
+### Mục tiêu tuần 6
 
-### Mục tiêu tuần 6:
+* Thảo luận và chỉnh sửa proposal, nội dung workshop.
+* Học Blender và tự làm một mô hình 3D của riêng mình.
 
-* Kết nối, làm quen với các thành viên trong First Cloud Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Công việc thực hiện trong tuần
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --------- | ------------ | ---------------- | ------------------- |
+| Hai | Học các kiến thức cơ bản về Blender cho dựng hình 3D. <br> Làm theo một số tutorial cho người mới để làm quen giao diện, cách thao tác với đối tượng, dùng modifier và thiết lập ánh sáng/render đơn giản. <br> Tạo được sản phẩm 3D đầu tay và xuất bản render cuối cùng. <br><br> Thành phẩm: [Blender render](https://drive.google.com/file/d/1aAOMoHdeUgXSEGXfX6zxjZibZQ2hB8la/view?usp=sharing). | 13/10/2025 | 13/10/2025 | – |
+| Ba | Họp nhóm. <br> Chỉnh sửa workshop proposal: chuyển sang sử dụng GuardDuty để phát hiện xâm nhập thay cho Lambda tự viết, do cần lượng dữ liệu lớn và thời gian phát triển dài. <br> Vẽ lại kiến trúc AWS: thêm GuardDuty thay cho CloudWatch Alarm. <br> Viết bản nháp proposal, mô tả các chức năng chính và ước tính chi phí ở mức tương đối. | 14/10/2025 | 14/10/2025 | – |
+| Tư | Họp nhóm. <br> Tiếp tục chỉnh sửa proposal: <br> &emsp; + Thêm EventBridge vào luồng xử lý. <br> &emsp; + Tối ưu lại chi phí bằng cách giảm cấu hình instance EC2 và số giờ hoạt động. <br> Cập nhật sơ đồ kiến trúc, bổ sung icon và kết nối của EventBridge. | 15/10/2025 | 15/10/2025 | – |
+| Năm | Cập nhật kiến trúc AWS: <br> &emsp; + Sắp xếp lại icon để luồng kết nối dễ nhìn hơn. <br> &emsp; + Đưa SSM vào trong group theo Region. <br> &emsp; + Thêm public subnet group cho EC2 instance. <br> Cài Amazon Q để hỗ trợ phân tích proposal. <br> Chỉnh sửa proposal, tính toán lại chi phí bằng AWS Pricing Calculator. | 16/10/2025 | 16/10/2025 | – |
+| Sáu | Việc gia đình. <br> Không thực hiện thêm học tập hay công việc liên quan workshop trong ngày này. | 17/10/2025 | 17/10/2025 | – |
 
+### Kết quả đạt được trong tuần 6
 
-### Kết quả đạt được tuần 6:
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+* Tiến triển rõ rệt với proposal và kiến trúc workshop, liên tục lặp lại thiết kế, tối ưu chi phí và bổ sung công cụ (GuardDuty, EventBridge, Amazon Q, AWS Pricing Calculator).
+* Hoàn thiện và triển khai được tài liệu proposal cùng worklog lên GitHub Pages.
+* Học được các kiến thức nền tảng về Blender và hoàn thành một sản phẩm 3D đầu tay như một kỹ năng bổ trợ.
+* Cân bằng tương đối tốt giữa công việc nhóm, kế hoạch học tập và trách nhiệm gia đình trong tuần.

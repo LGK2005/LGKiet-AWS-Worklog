@@ -1,58 +1,27 @@
 ---
-title: "Worklog Tuần 12"
-date: "2025-09-09"
-weight: 2
+title: "Nhật ký tuần 13"
+date: "2025-12-01"
+weight: 13
 chapter: false
-pre: " <b> 1.12 </b> "
+pre: " <b> 1.13. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
-### Mục tiêu tuần 12:
+### Mục tiêu tuần 13
+Hoàn thành project và nộp bài.
 
-* Kết nối, làm quen với các thành viên trong First Cloud Journey.
-* Hiểu dịch vụ AWS cơ bản, cách dùng console & CLI.
+### Công việc thực hiện trong tuần
 
-### Các công việc cần triển khai trong tuần này:
-| Thứ | Công việc                                                                                                                                                                                   | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu                            |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------- | ----------------------------------------- |
-| 2   | - Làm quen với các thành viên FCJ <br> - Đọc và lưu ý các nội quy, quy định tại đơn vị thực tập                                                                                             | 11/08/2025   | 11/08/2025      |
-| 3   | - Tìm hiểu AWS và các loại dịch vụ <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                            | 12/08/2025   | 12/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Tạo AWS Free Tier account <br> - Tìm hiểu AWS Console & AWS CLI <br> - **Thực hành:** <br>&emsp; + Tạo AWS account <br>&emsp; + Cài AWS CLI & cấu hình <br> &emsp; + Cách sử dụng AWS CLI | 13/08/2025   | 13/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Tìm hiểu EC2 cơ bản: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - Các cách remote SSH vào EC2 <br> - Tìm hiểu Elastic IP   <br>                  | 14/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Thực hành:** <br>&emsp; + Tạo EC2 instance <br>&emsp; + Kết nối SSH <br>&emsp; + Gắn EBS volume                                                                                         | 15/08/2025   | 15/08/2025      | <https://cloudjourney.awsstudygroup.com/> |
+| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Tài liệu tham khảo |
+| --- | --------- | ------------ | ---------------- | ------------------- |
+| Hai | Tiếp tục viết AWS CDK cho backend và lớp edge của dashboard: <br> &emsp; + Mở rộng CDK app hiện có để khai báo các Lambda dùng cho API của dashboard. <br> &emsp; + Thêm cấu hình CloudFront distribution để phục vụ dashboard và điều hướng các đường dẫn API. <br> &emsp; + Định nghĩa tài nguyên API Gateway và integration với Lambda bằng CDK. | 01/12/2025 | 01/12/2025 | [CDK Lambda + API tutorial](https://docs.aws.amazon.com/lambda/latest/dg/lambda-cdk-tutorial.html) |
+| Ba | Thêm Amazon Cognito vào kiến trúc để hỗ trợ đăng nhập cho dashboard: <br> &emsp; + Thiết kế vị trí của Cognito user pool giữa front-end và API Gateway. <br> &emsp; + Ôn lại luồng authentication và cách token được dùng để bảo vệ API. <br> &emsp; + Cập nhật sơ đồ kiến trúc để bổ sung Cognito và ghi chú cho phần triển khai sau này. | 02/12/2025 | 02/12/2025 | [Amazon Cognito user pools](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html) |
+| Tư | Kiểm thử deploy CDK và debug lỗi: <br> &emsp; + Chạy `cdk synth` và `cdk deploy` cho các stack liên quan đến dashboard. <br> &emsp; + Sửa lỗi logic và phân quyền (IAM policy, thiếu biến môi trường, sai reference, v.v.). <br> &emsp; + Deploy lại nhiều lần cho đến khi CloudFront, API Gateway và Lambda hoạt động đúng như mong đợi. | 03/12/2025 | 03/12/2025 | – |
+| Năm | Gộp các stack của các thành viên và test deploy tổng thể: <br> &emsp; + Kéo các CDK stack của những thành viên khác trong organization. <br> &emsp; + Tích hợp các stack đó (ETL, IR workflow, thành phần bảo mật) với stack dashboard. <br> &emsp; + Deploy ứng dụng tổng thể và kiểm tra các stack chạy cùng nhau mà không bị xung đột. | 04/12/2025 | 04/12/2025 | – |
+| Sáu | Việc gia đình. <br> Không ghi nhận thêm công việc project trong ngày. | 05/12/2025 | 05/12/2025 | – |
 
+### Kết quả đạt được trong tuần 13
 
-### Kết quả đạt được tuần 12:
-
-* Hiểu AWS là gì và nắm được các nhóm dịch vụ cơ bản: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
-
-* Đã tạo và cấu hình AWS Free Tier account thành công.
-
-* Làm quen với AWS Management Console và biết cách tìm, truy cập, sử dụng dịch vụ từ giao diện web.
-
-* Cài đặt và cấu hình AWS CLI trên máy tính bao gồm:
-  * Access Key
-  * Secret Key
-  * Region mặc định
-  * ...
-
-* Sử dụng AWS CLI để thực hiện các thao tác cơ bản như:
-
-  * Kiểm tra thông tin tài khoản & cấu hình
-  * Lấy danh sách region
-  * Xem dịch vụ EC2
-  * Tạo và quản lý key pair
-  * Kiểm tra thông tin dịch vụ đang chạy
-  * ...
-
-* Có khả năng kết nối giữa giao diện web và CLI để quản lý tài nguyên AWS song song.
-* ...
-
-
+* Mở rộng codebase CDK để mô tả đầy đủ các thành phần Lambda, CloudFront và API Gateway phục vụ cho đường đi của dashboard từ đầu đến cuối.
+* Thiết kế và ghi lại kiến trúc tích hợp Amazon Cognito để hỗ trợ đăng nhập và bảo vệ truy cập vào dashboard.
+* Deploy và debug thành công các stack CDK, sau đó gộp nhiều stack của cả nhóm thành một ứng dụng có thể triển khai đồng bộ.
+* Cân đối được thời gian giữa việc hoàn thiện project và xử lý công việc gia đình vào cuối tuần.
